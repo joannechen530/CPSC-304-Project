@@ -1,109 +1,111 @@
-/*
 
-LOGIN:
+/* LOGIN */
 
-*** declare a global variable (call it login?) to store login status ***
-(login=username for customer login; login=sin for staff login; login=null for not logged in)
-
-// Customer login - arguments(uname, password)
+-- Customer login - arguments(uname, password)
 SELECT username
 FROM Customer
 WHERE username=uname AND pw=password;
 
-// Staff login - arguments(uname, password)
+-- Staff login - arguments(uname, password)
 SELECT sin
 FROM Staff
 WHERE sin=uname AND pw=password;
 
-// Create account - arguments(uname, phone, password)
+-- Create account - arguments(uname, phone, password)
 INSERT INTO Customer VALUES(uname, phone, password);
 
-HOME: 
+/* HOME */ 
 
-// Find the list of restaurants
+-- Find the list of restaurants
 SELECT name
 FROM Restaurant;
 
-// Find the list of provinces
+-- Find the list of provinces
 SELECT DISTINCT province
 FROM Branch;
 
-// Find branches of a given restaurant - argument(restaurant)
+-- Find branches of a given restaurant - argument(restaurant)
 SELECT addr, city, province
 FROM Branch
 WHERE name=restaurant;
 
+-- Find restaurants that sell burgers and their branches that have the highest rating
+
+-- Find branches of a given restaurant with the highest rating
+--  Find the most popular dish of  a restaurant
 
 
-RESTAURANT - argument(restaurant)
 
-// Get basic info of a restaurant
+
+/* RESTAURANT - argument(restaurant) */
+
+-- Get basic info of a restaurant
 SELECT rname, type, s_date
 FROM Restaurant
 WHERE rname=restaurant;
 
-// Get a list of dishes that a restaurant sells
+-- Get a list of dishes that a restaurant sells
 SELECT dname, price, popularity
 FROM SellsDish
 WHERE rname=restaurant;
 
-// Get a list of branches of a restauran
+-- Get a list of branches of a restauran
 SELECT addr, city, province
 FROM Branch
 WHERE rname=restaurant;
 
-// Get the pc of a branch given address - argument(a, c)
+-- Get the pc of a branch given address - argument(a, c)
 SELECT pc
 FROM Branch
 WHERE addr=a AND city=c;
 
-PROVINCE - argument(prov)
+/* PROVINCE - argument(prov) */
 
-// Find branches in a given province
-!!! select rname???
+-- Find branches in a given province
+--!!! select rname???
 SELECT addr, city
 FROM Branch
 WHERE province=prov
 GROUP BY rname
 ORDER BY city;
 
-// Get the pc of a branch given address - argument(a, c)
+-- Get the pc of a branch given address - argument(a, c)
 SELECT pc
 FROM Branch
 WHERE addr=a AND city=c;
 
-BRANCH - argument(postalCode)
+/* BRANCH - argument(postalCode) */
 
-// Get basic info of a branch
+-- Get basic info of a branch
 SELECT rname, type, s_date, phone, addr, city, prov, capacity, rating
 FROM Branch
 WHERE pc=postalCode;
 
-// Get comments of a branch
+-- Get comments of a branch
 SELECT rating, p_date, comments, username
 FROM Reviews
 WHERE pc=postalCode;
 
-REVIEW - argument(postalCode)
+/* REVIEW - argument(postalCode) */
 
-// Get restaurant name and branch
+-- Get restaurant name and branch
 SELECT rname, addr, city, province
 FROM Branch
 WHERE pc=postalCode;
 
-// Insert a review - arguments(rating, comments)
+-- Insert a review - arguments(rating, comments)
 INSERT INTO Reviews VALUES(login, potalCode, rating, <date>, comments);
 
-MANAGER 
+/* MANAGER */
 
-// Get general staff page info → see below
+-- Get general staff page info → see below
 
-// Get branches and related info that the manager is managing 
+-- Get branches and related info that the manager is managing 
 SELECT addr, city, province, budge, performance
 FROM Branch
 WHERE sin=login;
 
-// Find staff in branches managed by the manager - arguments(sname)
+-- Find staff in branches managed by the manager - arguments(sname)
 SELECT name, sin    //display name, use sin to jump to staff page
 FROM Staff s, WorksAt w
 WHERE name=sname AND
@@ -112,7 +114,7 @@ WHERE name=sname AND
 		      FROM WorksAt
 		      WHERE sin=login);
 
-// Find staff in branches managed by the manager - arguments(input_sin)
+-- Find staff in branches managed by the manager - arguments(input_sin)
 SELECT name, sin    //display name, use sin to jump to staff page
 FROM Staff s, WorksAt w
 WHERE s.sin=input_sin AND
@@ -121,7 +123,7 @@ WHERE s.sin=input_sin AND
 		      FROM WorksAt
 		      WHERE sin=login);
 
-// Find staff in branches managed by the manager - arguments(postalCode)
+-- Find staff in branches managed by the manager - arguments(postalCode)
 SELECT name, sin    //display name, use sin to jump to staff page
 FROM Staff s, WorksAt w
 WHERE  s.sin=w.sin AND
@@ -130,28 +132,28 @@ WHERE  s.sin=w.sin AND
 		      FROM WorksAt
 		      WHERE sin=login);
 
-// List the performances of each branch/manager of a given restaurant - argument(restaurant)
+-- List the performances of each branch/manager of a given restaurant - argument(restaurant)
 SELECT performance, pc
 FROM Branch
 WHERE rname=restaurant
 ORDER BY performance desc;
 
-// Find the number of visits - arguments(from, to, branch)
+-- Find the number of visits - arguments(from, to, branch)
 SELECT SUM(num)
 FROM Visits
 WHERE v_date>=from OR v_date<=to AND pc=branch;
-!!! How do we compare dates???
+--!!! How do we compare dates???
 
-// Add visits - arguments(phn, date, branch, ppl)
+-- Add visits - arguments(phn, date, branch, ppl)
 CREATE VIEW User 
 SELECT uname
 FROM Customer
 WHERE phone=phn;
 INSERT INTO Visits VALUES(User, branch, date, ppl);
 
-STAFF LIST
+/* STAFF LIST */
 
-// View the list of staff working at the branches managed by the manager
+-- View the list of staff working at the branches managed by the manager
 SELECT name
 FROM Staff s, WorksAt w
 WHERE s.sin=w.sin AND 
@@ -160,7 +162,7 @@ WHERE s.sin=w.sin AND
 		WHERE sin=login)
 ORDER BY name;
 
-// View the list of staff used to work at the branches managed by the manager
+-- View the list of staff used to work at the branches managed by the manager
 SELECT name
 FROM Staff s, HasWorkedAt h
 WHERE s.sin=h.sin AND
@@ -192,7 +194,7 @@ CHEF
 
 
 
-
+/*
 General: 
 Find the ratings of each branch
 Find the branch of a restaurant with the highest rating (10)
@@ -207,7 +209,6 @@ branch addr, phone, capacity, rating, reviews
 Find restaurants in a given location (province (and city))
 then find branches 
 Find branches of restaurants they have visited
-//
 Find restaurants that sell burgers and their branches that have the highest rating
 Find branches of a given restaurant with the highest rating
 Find the most popular dish of  a restaurant
@@ -261,5 +262,7 @@ view and update their availability
 Transitions:
 Look up position and generate unique pages
 Sign up for an account 
-
 */
+
+
+
