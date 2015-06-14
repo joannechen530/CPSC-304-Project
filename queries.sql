@@ -31,6 +31,19 @@ WHERE name=restaurant;
 
 -- Find restaurants that sell burgers and their branches that have the highest rating
 
+CREATE VIEW MX 
+SELECT MAX(av_rating)
+FROM Branch
+GROUP BY Restaurant
+
+SELECT rname, pc
+FROM Branch 
+WHERE av_rating = MX rname AND rname IN (
+SELECT DISTINCT rname
+FROM Restaurant natural inner join SellsDish
+WHERE dname like '%burger&' or dname like '%Burger%')
+
+
 -- Find branches of a given restaurant with the highest rating
 --  Find the most popular dish of  a restaurant
 
