@@ -109,6 +109,13 @@ WHERE pc=postalCode;
 -- Insert a review - arguments(rating, comments)
 INSERT INTO Reviews VALUES(login, potalCode, rating, <date>, comments);
 
+-- Update the average rating of a given branch when a new rating is inserted - argument(v_rpc)
+UPDATE Branch
+SET av_rating = (SELECT AVG(rating)
+FROM Reviews
+WHERE pc = v_rpc
+GROUP BY pc) ;
+
 /* MANAGER */
 
 -- Get general staff page info → see below
