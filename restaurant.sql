@@ -12,6 +12,7 @@ drop table WorksAt;
 drop table HasWorkedAt;
 drop table Reviews;
 drop table Visits;
+drop table Manager;
 
 CREATE TABLE Customer
 	(username CHAR(20) not null,
