@@ -1,12 +1,18 @@
 <!DOCTYPE HTML>
 <html> 
 <body>
-<p>Restaurant Database Home</p>
+<p>Staff Login:</p>
 
 <form action="" method="post">
 Name: <input type="text" name="user"><br>
 Password: <input type="text" name="pass"><br>
-<input type="submit" name = 'login' value = "LOGIN">
+<input type="submit" name = 'slogin' value = "LOGIN">
+<br><br>
+Customer Login:<br>
+<form action="" method="post">
+Name: <input type="text" name="user"><br>
+Password: <input type="text" name="pass"><br>
+<input type="submit" name = 'clogin' value = "LOGIN">
 <br><br><br><br><br><br><br><br>
 
 
