@@ -83,19 +83,105 @@ values('user3333', '778 333-0500');
 
  
 insert into Staff
-values ('165867486', 'Charlotte', 'password1', 'Mon,Tues,Fri');
+values (165867486, 'Charlotte', 'password1', 'Mon,Tues,Fri');
 
 insert into Staff
-values ('111222333', 'Bob', 'password2', 'Always');
+values (111222333, 'Bob', 'password2', 'Always');
 
 insert into Staff
-values ('444888555', 'Kate', 'password3', 'Weekends');
+values (444888555, 'Kate', 'password3', 'Weekends'); --waiter
 
 insert into Staff
-values ('222999666', 'Jake', 'password4', 'Always');
+values (222999666, 'Jake', 'password4', 'Always'); --waiter
 
 insert into Staff
-values ('555666999', 'Jake', 'password5', 'Weekdays');
+values (555666999, 'Jake', 'password5', 'Weekdays'); --chef
+
+insert into Staff
+values (486957496, 'Sara', 'password6', 'Mon'); --waiter
+
+insert into Staff
+values (444978690, 'Mike', 'password7', 'Weekend'); --waiter
+
+insert into Staff
+values (220996978, 'Eva', 'password8', 'Tues,Thurs'); --waiter
+
+insert into Staff
+values (285769686, 'Pikachu', 'password9', 'Always'); --chef
+
+insert into Staff
+values (666888777, 'Groot', 'password10', 'Always'); --chef
+
+insert into Staff
+values (334455668, 'Wolverine', 'password11', 'Always'); --chef
+
+insert into Staff
+values (229604950, 'Ironman', 'password12', 'Always'); --chef
 
 
+ 
+insert into Restaurant
+values('McDonald’s', 'American', '1980-01-01');
 
+insert into Restaurant
+values('Sushi Town', 'Japanese', '2009-09-06');
+
+insert into Restaurant
+values('Le Crocodile', 'French', '2005-03-31');
+
+insert into Restaurant
+values('Italian Kitchen', 'Italian', '1996-02-29');
+
+insert into Restaurant
+values('Peaceful', 'Chinese', '2011-11-11');
+
+
+ 
+insert into SellsDish
+values('McDonald’s', 'cheeseburger', 3, 2);
+
+insert into SellsDish
+values('Sushi Town', 'crunch roll', 6, 2);
+
+insert into SellsDish
+values('Le Crocodile', 'salad', 4, 0);
+
+insert into SellsDish
+values('Italian Kitchen', 'meatball', 4, 1);
+
+insert into SellsDish
+values('Peaceful', 'noodles', 6, 1);
+
+
+ 
+insert into Waiter
+values(222999666, 'Mon, Tues, Wed, Thurs, Fri: 8-4');
+
+insert into Waiter
+values(486957496, 'Mon: 4-8');
+
+insert into Waiter
+values(444978690, 'Sat: 4-8, Sun: 3-8');
+
+insert into Waiter
+values(220996978, 'Tues: 4-8, Thurs: 9-5');
+
+insert into Waiter
+values(444888555, 'Sat: 9-5, Sun: 9-5');
+
+
+ 
+insert into Chef
+values(555666999, 'Food safe');
+
+insert into Chef
+values(285769686, 'University of Food degree');
+
+insert into Chef
+values(666888777, 'null');
+
+insert into Chef
+values(334455668, 'Community College diploma, food safe');
+
+insert into Chef
+values(229604950, 'College diploma, food safe, university bachelors'); 
