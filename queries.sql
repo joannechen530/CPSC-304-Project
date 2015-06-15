@@ -11,10 +11,11 @@ SELECT sin
 FROM Staff
 WHERE sin=uname AND pw=password;
 
--- Create account - arguments(uname, phone, password)
+-- Create account - arguments(uname, phone, password) 
+-- FOR CUSTOMERS ONLY. STAFF CAN ONLY BE ADDED BY SOMEONE ELSE.
 INSERT INTO Customer VALUES(uname, phone, password);
 
-/* HOME */ 
+/* GENERAL */ 
 
 -- Find the list of restaurants
 SELECT name
@@ -29,26 +30,36 @@ SELECT addr, city, province
 FROM Branch
 WHERE name=restaurant;
 
--- Find restaurants that sell burgers and their branches that have the highest rating
-
-CREATE VIEW MX 
-SELECT MAX(av_rating)
-FROM Branch
-GROUP BY Restaurant
+-- Find the most highly rated restaurants that sell a specific dish (e.g. burger) - argument(dish)
+CREATE VIEW PlacesWithDish 
+SELECT DISTINCT rname
+FROM Restaurant natural inner join SellsDish
+WHERE dname like '%dish&';
 
 SELECT rname, pc
 FROM Branch 
-WHERE av_rating = MX rname AND rname IN (
-SELECT DISTINCT rname
-FROM Restaurant natural inner join SellsDish
-WHERE dname like '%burger&' or dname like '%Burger%')
+WHERE rname in PlacesWithDish AND 
+      av_rating = (SELECT MAX(av_rating)
+		   FROM Branch
+		   GROUP BY rname
+		   HAVING rname IN PlacesWithDish);
 
+-- Find branches of a given restaurant with the highest rating - argument(restaurant)
+SELECT pc
+FROM Branch b1
+WHERE rname = restaurant 
+	AND NOT EXIST (SELECT *
+		    FROM Branch b2
+		    WHERE b1.rating < b2.rating);
 
--- Find branches of a given restaurant with the highest rating
---  Find the most popular dish of  a restaurant
-
-
-
+		  
+--  Find the most popular dish of a restaurant - argument(retaurant)
+SELECT dname
+FROM SellsDish sd1
+WHERE rname = restaurant 
+	AND NOT EXIST (SELECT *
+	FROM SellsDish sd2
+	WHERE sd1.popularity < sd2.popularity)
 
 /* RESTAURANT - argument(restaurant) */
 
@@ -62,7 +73,7 @@ SELECT dname, price, popularity
 FROM SellsDish
 WHERE rname=restaurant;
 
--- Get a list of branches of a restauran
+-- Get a list of branches of a restaurant
 SELECT addr, city, province
 FROM Branch
 WHERE rname=restaurant;
@@ -191,16 +202,81 @@ WHERE s.sin=h.sin AND
 		WHERE sin=login)
 ORDER BY name;
 
-ADD STAFF 
+-- Add staff - argument(v_sin, v_pw, v_name, avail, curr_date, v_pc, v_pos, v_salary)
+INSERT INTO Staff VALUES(v_sin, avail, v_name, v_pw);
+INSERT INTO WorksAt VALUES(v_sin, v_pc, curr_date, v_pos, v_salary);
+-- if adding a waiter - argument(v_shifts)
+INSERT INTO Waiter VALUES (v_sin, v_shifts);
+-- if adding a chef - argument(v_schedule, v_certificates)
+INSERT INTO Chef VALUES(v_sin, v_schedule, v_certificates);
+
+
+/* EDIT STAFF */
+
+-- Update shifts - argument(v_sin, v_shifts)
+UPDATE Waiter
+SET shifts = v_shifts
+WHERE sin = v_sin;
+
+-- Update schedule - arguments(v_sin, v_schedule)
+UPDATE Chef
+SET schedule = v_schedule
+WHERE sin = v_sin;
+
+-- Update certificates - arguments(v_sin, v_certificates)
+-- REMEMBER TO APPEND ORIGINAL CERTIFICATES TO THE NEW ONE (INPUT)
+UPDATE Chef
+SET certificates = v_certificates
+WHERE sin = v_sin
+
+-- Remove a manager from a branch
+
+-- Move a manager to a different branch and (new_manager, old_manager, from_branch, to_branch)
+UPDATE Branch
+SET sin = old_manager
+WHERE pc = to_branch
+-- Replace him with someone else
+UPDATE Branch
+SET sin = new_manager
+WHERE pc = from_branch
+
+
+UPDATE Branch
+SET sin = v_manager
+WHERE pc = to_branch
+
+-- Add a branch to a manager (v_manage, v_branch)
 
 
 
-EDIT STAFF
 
 
+/* GENERAL STAFF PAGE */
 
-GENERAL STAFF PAGE 
+-- Get basic info: sin, name, availability, pos, start date, salary - argument(v_sin)
+SELECT name, sin, availability, since, pos, salary
+FROM Staff natural inner join WorksAt
+WHERE sin = v_sin;
 
+-- Update password - argument(new_pw, v_sin)
+UPDATE Staff 
+SET pw = new_pw
+WHERE sin = v_sin;
+
+-- Update availability - argument(avail, v_sin)
+UPDATE Staff
+SET availability = avail
+WHERE sin = v_sin;
+
+-- Look up name supervisor - argument(v_sin)
+SELECT name;
+FROM Supervises, Staff
+WHERE sr_sin = sin AND jr_sin = v_sin;
+
+-- Look up staff members that an employee is supervizing - argument(v_sin)
+SELECT name;
+FROM Supervises, Staff
+WHERE jr_sin = sin AND sr_sin = v_sin;
 
 
 WAITER
@@ -283,6 +359,5 @@ Transitions:
 Look up position and generate unique pages
 Sign up for an account 
 */
-
 
 
