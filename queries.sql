@@ -13,9 +13,14 @@ FROM Customer
 WHERE username=uname AND pw=password;
 
 -- Staff login - arguments(uname, password)
+-- checks if user is a staff 
 SELECT sin
 FROM Staff
 WHERE sin=uname AND pw=password;
+
+SELECT sinm
+FROM Manager
+WHERE sin=un
 
 -- Create account - arguments(uname, phone, password) 
 -- FOR CUSTOMERS ONLY. STAFF CAN ONLY BE ADDED BY SOMEONE ELSE.
