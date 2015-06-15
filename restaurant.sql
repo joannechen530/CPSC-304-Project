@@ -63,3 +63,39 @@ CREATE TABLE Chef(
 	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on Chef to public;
+
+
+insert into Customer
+values('TheEater56', '416 555-0100');
+
+insert into Customer
+values('FoodieFoo', '604 666-0200');
+
+insert into Customer
+values('CheeseBurgo', '741 888-0300');
+
+insert into Customer
+values('ieatyou36', '250 000-0400');
+
+insert into Customer
+values('user3333', '778 333-0500');
+
+
+ 
+insert into Staff
+values ('165867486', 'Charlotte', 'password1', 'Mon,Tues,Fri');
+
+insert into Staff
+values ('111222333', 'Bob', 'password2', 'Always');
+
+insert into Staff
+values ('444888555', 'Kate', 'password3', 'Weekends');
+
+insert into Staff
+values ('222999666', 'Jake', 'password4', 'Always');
+
+insert into Staff
+values ('555666999', 'Jake', 'password5', 'Weekdays');
+
+
+
