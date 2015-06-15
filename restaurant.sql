@@ -1,18 +1,23 @@
+--Initializing (drop tables)
+
 drop table Customer;
 drop table Staff;
-drop table Restaurant;
-drop table SellsDish;
+drop table Manager;
 drop table Waiter;
 drop table Chef;
+drop table Supervises;
+drop table Restaurant;
+drop table SellsDish;
 
 --havnt done these
-drop table Supervises;
 drop table Branch;
 drop table WorksAt;
 drop table HasWorkedAt;
 drop table Reviews;
 drop table Visits;
-drop table Manager;
+
+---------------------------------------
+--Create tables
 
 CREATE TABLE Customer
 	(username CHAR(20) not null,
@@ -29,7 +34,36 @@ CREATE TABLE Staff
 	PRIMARY KEY (sin));
  
 grant select on Staff to public;
+
+ CREATE TABLE Manager
+ 	(sin INT not null);
+ 	
+grant select on Manager to public;
+
+CREATE TABLE Waiter
+	(sin INT not null, 
+	shifts CHAR(200) null,
+	PRIMARY KEY(sin),
+	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
  
+grant select on Waiter to public;
+ 
+CREATE TABLE Chef
+	(sin INT not null,
+	schedule CHAR(200) null,
+	certificates CHAR(200) null,
+	
+	PRIMARY KEY(sin),
+	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
+ 
+grant select on Chef to public;
+
+CREATE TABLE Supervises
+	(sr_sin INT not null,
+	jr_sin INT not null);
+
+grant select on Supervises to public;
+
 CREATE TABLE Restaurant
 	(name CHAR(50) not null,
 	type CHAR(50) null,
@@ -47,26 +81,11 @@ CREATE TABLE SellsDish
 	FOREIGN KEY(restaurant_name) REFERENCES Restaurant ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on SellsDish to public;
- 
 
-CREATE TABLE Waiter
-	(sin INT not null, 
-	shifts CHAR(200) null,
-	PRIMARY KEY(sin),
-	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
- 
-grant select on Waiter to public;
- 
-CREATE TABLE Chef(
-	sin INT not null,
-	schedule CHAR(200) null,
-	certificates CHAR(200) null,
-	
-	PRIMARY KEY(sin),
-	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
- 
-grant select on Chef to public;
+--------------------------------------------
+--Inserting instances
 
+--Customer
 
 insert into Customer
 values('TheEater56', '416 555-0100');
@@ -84,12 +103,13 @@ insert into Customer
 values('user3333', '778 333-0500');
 
 
+--Staff
  
 insert into Staff
 values (165867486, 'Charlotte', 'password1', 'Mon,Tues,Fri');
 
 insert into Staff
-values (111222333, 'Bob', 'password2', 'Always');
+values (111222333, 'Bob', 'password2', 'Always'); --Manager
 
 insert into Staff
 values (444888555, 'Kate', 'password3', 'Weekends'); --waiter
@@ -121,41 +141,38 @@ values (334455668, 'Wolverine', 'password11', 'Always'); --chef
 insert into Staff
 values (229604950, 'Ironman', 'password12', 'Always'); --chef
 
+insert into Staff
+values (534534999, 'Ketchup', 'password13', 'Always'); --Manager
 
- 
-insert into Restaurant
-values('McDonald’s', 'American', '1980-01-01');
+insert into Staff
+values (999999999, 'Steph', 'password14', 'Always'); --Manager
 
-insert into Restaurant
-values('Sushi Town', 'Japanese', '2009-09-06');
+insert into Staff
+values (812837478, 'Honey', 'password15', 'Always'); --Manager
 
-insert into Restaurant
-values('Le Crocodile', 'French', '2005-03-31');
-
-insert into Restaurant
-values('Italian Kitchen', 'Italian', '1996-02-29');
-
-insert into Restaurant
-values('Peaceful', 'Chinese', '2011-11-11');
+insert into Staff
+values (134585289, 'Sugar', 'password15', 'Always'); --Manager
 
 
- 
-insert into SellsDish
-values('McDonald’s', 'cheeseburger', 3, 2);
+--Manager 
 
-insert into SellsDish
-values('Sushi Town', 'crunch roll', 6, 2);
+insert into Manager
+values(111222333);
 
-insert into SellsDish
-values('Le Crocodile', 'salad', 4, 0);
+insert into Manager
+values(534534999);
 
-insert into SellsDish
-values('Italian Kitchen', 'meatball', 4, 1);
+insert into Manager
+values(999999999);
 
-insert into SellsDish
-values('Peaceful', 'noodles', 6, 1);
+insert into Manager
+values(134585289);
+
+insert into Manager
+values(812837478);
 
 
+--Waiter
  
 insert into Waiter
 values(222999666, 'Mon, Tues, Wed, Thurs, Fri: 8-4');
@@ -173,6 +190,7 @@ insert into Waiter
 values(444888555, 'Sat: 9-5, Sun: 9-5');
 
 
+--Chef
  
 insert into Chef
 values(555666999, 'Food safe', 'Mon, Tues, Wed, Thurs, Fri: 8-4');
@@ -187,4 +205,70 @@ insert into Chef
 values(334455668, 'Community College diploma, food safe', 'Mon, Tues, Wed, Thurs: 4-10');
 
 insert into Chef
-values(229604950, 'College diploma, food safe, university bachelors', 'Sat, Sun: 9-5'); 
+values(229604950, 'College diploma, food safe, university bachelors', 'Sat, Sun: 9-5');\
+
+
+--Supervises
+
+insert into Supervises
+values('999999999', '334455668');
+
+insert into Supervises
+values('999999999', '222999666');
+
+insert into Supervises
+values('111222333', '220996978');
+
+insert into Supervises
+values('534534999', '555666999');
+
+insert into Supervises
+values('534534999', '229604950');
+
+
+--Restaurant
+ 
+insert into Restaurant
+values('McDonald’s', 'American', '1980-01-01');
+
+insert into Restaurant
+values('Sushi Town', 'Japanese', '2009-09-06');
+
+insert into Restaurant
+values('Le Crocodile', 'French', '2005-03-31');
+
+insert into Restaurant
+values('Italian Kitchen', 'Italian', '1996-02-29');
+
+insert into Restaurant
+values('Peaceful', 'Chinese', '2011-11-11');
+
+
+--SellsDish
+ 
+insert into SellsDish
+values('McDonald’s', 'cheeseburger', 3, 2);
+
+insert into SellsDish
+values('Sushi Town', 'crunch roll', 6, 2);
+
+insert into SellsDish
+values('Le Crocodile', 'salad', 4, 0);
+
+insert into SellsDish
+values('Italian Kitchen', 'meatball', 4, 1);
+
+insert into SellsDish
+values('Peaceful', 'noodles', 6, 1);
+
+
+
+
+
+
+
+
+
+
+
+
