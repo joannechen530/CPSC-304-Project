@@ -2,7 +2,6 @@
  * - !!!
  * - date in sql
  * - rearrange list
- * - check view syntax
  */
 
 
@@ -38,7 +37,7 @@ FROM Branch
 WHERE name=restaurant;
 
 -- Find the most highly rated restaurants that sell a specific dish (e.g. burger) - argument(dish)
-CREATE VIEW PlacesWithDish 
+CREATE VIEW PlacesWithDish AS
 SELECT DISTINCT rname
 FROM Restaurant natural inner join SellsDish
 WHERE dname like '%dish&';
@@ -182,8 +181,8 @@ FROM Visits
 WHERE v_date>=from OR v_date<=to AND pc=branch;
 --!!! How do we compare dates???
 
--- Add visits - arguments(phn, date, branch, ppl)
-CREATE VIEW User 
+-- Add a visit - arguments(phn, date, branch, ppl)
+CREATE VIEW User AS
 SELECT uname
 FROM Customer
 WHERE phone=phn;
@@ -201,14 +200,14 @@ WHERE salary > (SELECT AVG(salary) FROM Staff natural inner join WorksAt);
 
 -- Find the waiter with the highest pay and make him supervise all the other waiters
 -- if there is more than one, choose the one with the earliest start date. If there's still more than one, then choose one arbitrarily
-CREATE VIEW WaitorWithMostPay(sin)
+CREATE VIEW WaitorWithMostPay AS
 SELECT w.sin
 FROM Waiter w, WorksAt wa1
 WHERE w.sin = wa1.sin AND 
 	NOT EXIST (SELECT * 
 		   FROM WorksAt wa2
 		   WHERE wa1.salary < wa2.salary);
-CREATE VIEW Candidate
+CREATE VIEW Candidate AS
 SELECT sin
 FROM WaitorWithMostPay w1
 ORDER BY since asc; --!!!!!
