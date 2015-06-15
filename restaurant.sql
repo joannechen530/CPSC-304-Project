@@ -59,7 +59,9 @@ grant select on Waiter to public;
  
 CREATE TABLE Chef(
 	sin INT not null,
+	schedule CHAR(200) null,
 	certificates CHAR(200) null,
+	
 	PRIMARY KEY(sin),
 	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
  
@@ -173,16 +175,16 @@ values(444888555, 'Sat: 9-5, Sun: 9-5');
 
  
 insert into Chef
-values(555666999, 'Food safe');
+values(555666999, 'Food safe', 'Mon, Tues, Wed, Thurs, Fri: 8-4');
 
 insert into Chef
-values(285769686, 'University of Food degree');
+values(285769686, 'University of Food degree', 'Mon, Tues, Wed, Thurs, Fri, Sat, Sun: 8-4');
 
 insert into Chef
-values(666888777, 'null');
+values(666888777, 'null', 'Fri, Sat, Sun: 4-10');
 
 insert into Chef
-values(334455668, 'Community College diploma, food safe');
+values(334455668, 'Community College diploma, food safe', 'Mon, Tues, Wed, Thurs: 4-10');
 
 insert into Chef
-values(229604950, 'College diploma, food safe, university bachelors'); 
+values(229604950, 'College diploma, food safe, university bachelors', 'Sat, Sun: 9-5'); 
