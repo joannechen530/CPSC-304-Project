@@ -1,8 +1,8 @@
 /* TODO's: 
- * - !!!
- * - date in sql
  * - rearrange list
  */
+ 
+ /*** NOTE: write dates as numbers in the form yyyymmdd ***/
 
 
 /* LOGIN */
@@ -92,12 +92,10 @@ WHERE addr=a AND city=c;
 /* PROVINCE - argument(prov) */
 
 -- Find branches in a given province
---!!! select rname???
-SELECT addr, city
+SELECT addr, city, rname
 FROM Branch
 WHERE province=prov
-GROUP BY rname
-ORDER BY city;
+ORDER BY rname, city;
 
 -- Get the pc of a branch given address - argument(a, c)
 SELECT pc
@@ -175,11 +173,10 @@ FROM Branch
 WHERE rname=restaurant
 ORDER BY performance desc;
 
--- Find the number of visits - arguments(from, to, branch)
+-- Find the number of visits - arguments(from_date, to_date, branch)
 SELECT SUM(num)
 FROM Visits
-WHERE v_date>=from OR v_date<=to AND pc=branch;
---!!! How do we compare dates???
+WHERE v_date>=from_date OR v_date<=to_date AND pc=branch;
 
 -- Add a visit - arguments(phn, date, branch, ppl)
 CREATE VIEW User AS
@@ -210,7 +207,7 @@ WHERE w.sin = wa1.sin AND
 CREATE VIEW Candidate AS
 SELECT sin
 FROM WaitorWithMostPay w1
-ORDER BY since asc; --!!!!!
+ORDER BY since;
 
 INSERT INTO Supervises
 SELECT Candidate, sin
