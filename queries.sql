@@ -1,3 +1,10 @@
+/* TODO's: 
+ * - !!!
+ * - date in sql
+ * - rearrange list
+ * - check view syntax
+ */
+
 
 /* LOGIN */
 
@@ -182,6 +189,34 @@ FROM Customer
 WHERE phone=phn;
 INSERT INTO Visits VALUES(User, branch, date, ppl);
 
+
+-- set the salary of the staff whose pay is higher than the average to be the current average
+UPDATE Staff
+SET salary = (SELECT AVG(salary) FROM Staff natural inner join WorksAt)
+WHERE salary > (SELECT AVG(salary) FROM Staff natural inner join WorksAt);
+
+
+--  !!! transfer all the staff members currently working that have worked at a specific branch but no longer work there to that branch in their current positions
+
+
+-- Find the waiter with the highest pay and make him supervise all the other waiters
+-- if there is more than one, choose the one with the earliest start date. If there's still more than one, then choose one arbitrarily
+CREATE VIEW WaitorWithMostPay(sin)
+SELECT w.sin
+FROM Waiter w, WorksAt wa1
+WHERE w.sin = wa1.sin AND 
+	NOT EXIST (SELECT * 
+		   FROM WorksAt wa2
+		   WHERE wa1.salary < wa2.salary);
+CREATE VIEW Candidate
+SELECT sin
+FROM WaitorWithMostPay w1
+ORDER BY since asc; --!!!!!
+
+INSERT INTO Supervises
+SELECT Candidate, sin
+FROM Waiter;
+
 /* STAFF LIST */
 
 -- View the list of staff working at the branches managed by the manager
@@ -212,6 +247,20 @@ INSERT INTO Chef VALUES(v_sin, v_schedule, v_certificates);
 
 
 /* EDIT STAFF */
+-- remove a staff member from current pos - argument(curr_date, v_sin)
+INSERT INTO HasWorkedAt
+SELECT v_sin as sin, pc, since, curr_date as to, salary, pos
+FROM WorksAt 
+WHERE sin = v_sin;
+
+DELETE
+FROM WorksAt
+WHERE sin = v_sin;
+
+-- Move an employee to a new position - argument(curr_date, v_sin, new_pos, pc, salary) 
+-- CALL REMOVE FIRST
+INSERT INTO WorksAt VALUES (v_sin, pc, curr_date, new_pos, salary);
+
 
 -- Update shifts - argument(v_sin, v_shifts)
 UPDATE Waiter
@@ -227,26 +276,23 @@ WHERE sin = v_sin;
 -- REMEMBER TO APPEND ORIGINAL CERTIFICATES TO THE NEW ONE (INPUT)
 UPDATE Chef
 SET certificates = v_certificates
-WHERE sin = v_sin
+WHERE sin = v_sin;
 
--- Remove a manager from a branch
 
 -- Move a manager to a different branch and (new_manager, old_manager, from_branch, to_branch)
 UPDATE Branch
 SET sin = old_manager
-WHERE pc = to_branch
--- Replace him with someone else
+WHERE pc = to_branch;
+-- Replace him with someone else 
+-- CALL AFTER MOVING MANAGER 
 UPDATE Branch
 SET sin = new_manager
-WHERE pc = from_branch
+WHERE pc = from_branch;
 
-
+-- Add a branch to a manager (v_manager, v_branch)
 UPDATE Branch
 SET sin = v_manager
-WHERE pc = to_branch
-
--- Add a branch to a manager (v_manage, v_branch)
-
+WHERE pc = v_branch;
 
 
 
@@ -277,17 +323,6 @@ WHERE sr_sin = sin AND jr_sin = v_sin;
 SELECT name;
 FROM Supervises, Staff
 WHERE jr_sin = sin AND sr_sin = v_sin;
-
-
-WAITER
-
-
-
-CHEF
-
-
-
-
 
 
 /*
@@ -336,12 +371,11 @@ Find the most popular dishes of a restaurant in a region (city or province)
 Find and count all the users that have visited a branch on a specific day
 Look up information of staff
 Find and compare the performances of other managers of a given restaurant
-
-//
 delete staff whose pay is higher than the average
 set the salary of the staff whose pay is higher than the average to be the average
 transfer all the staff members that have worked at a specific branch but no longer work there to that branch in their current positions
 Find the waiter with the highest pay and make him supervise all the other waiters
+
 Waiters:
 Look up their shifts (schedules) and salaries
 add customer records (on which date did they visit which restaurant/branch)
