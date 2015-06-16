@@ -10,23 +10,21 @@ Password: <input type="text" name="pass"><br>
 <br><br>
 Customer Login:<br>
 <form action="" method="post">
-Name: <input type="text" name="user"><br>
-Password: <input type="text" name="pass"><br>
+Name: <input type="text" name="cuser"><br>
+Password: <input type="text" name="cpass"><br>
 <input type="submit" name = 'clogin' value = "LOGIN">
 <br><br><br><br><br><br><br><br>
 
 
-<p>Find all branches (Optional: in a province or city) </p>
+<p>Find all branches (In a province or city) </p>
 <p><font size="2"> Restaurant Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Province&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;City </font></p>
 <form method="POST" action="login.php">
 <!--refresh page when submit-->
    <p><input type="text" name="rnamebranches" size="6"><input type="text" name="provincebranches" size="6"><input type="text" name="citybranches" size="6">
 <!--define variables to pass the value-->      
-<br><input type="submit" value="Search all branches" name="searchforallbranches"></p>
-</form>
-<form method="POST" action="login.php">
 <input type="submit" value="Search for branches by city" name="searchforbranchesincity"><br>
 </form>
+
 
 
 <p>Find a branches reviews: </p>
@@ -131,6 +129,7 @@ function executeBoundSQL($cmdstr, $list) {
 }
 
 
+
 if ($db_conn){
 
 	if (array_key_exists('searchforbranchesincity', $_POST)){
@@ -155,7 +154,6 @@ if ($db_conn){
 				$tuple
 			);
 			executeBoundSQL("select addr, city, province, phone, av_rating, s_date, capacity  from Branches where :bind1 = name order by av_rating", $alltuples);
-			//print
 
 			OCICommit($db_conn);
 	} else
@@ -168,7 +166,6 @@ if ($db_conn){
 				$tuple
 			);
 		executeBoundSQL("select rname, type, s_date from Restaurant where rname=restaurant;", $alltuples);
-		//print
 		OCICommit($db_conn);
 	} else
 
@@ -181,11 +178,10 @@ if ($db_conn){
 				$tuple
 			);
 		executeBoundSQL("select dname, price, popularity FROM SellsDish WHERE rname=:bind1", $alltuples);
-		//print
 		OCICommit($db_conn);
 	} else 
 
-if (array_key_exists('searchforreviews', $_POST)){
+	if (array_key_exists('searchforreviews', $_POST)){
 		$result = executePlainSQL("select r.username, r.rating, r.comments from reviews r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."'')");
 		echo "<br>Got data from table Reviews:<br>";
 			echo "<table>";
@@ -199,39 +195,28 @@ if (array_key_exists('searchforreviews', $_POST)){
 		OCICommit($db_conn);
 	}
 
-
-
-/*
-	if ($_POST && $success) {
-		header("location: login.php");
-	} else {
-		// Select data...
-		$result = executePlainSQL("select * from branches");
-			echo "<br>Got data from table Branches:<br>";
-			echo "<table>";
-			echo "<tr><th>Address</th><th>City</th><th>Province</th><th>Phone</th><th>Rating</th></tr>";
-
-			while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-				echo "<tr><td>" . $result["ADDR"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["AV_RATING"] . "</td></tr>"; //or just use "echo $row[0]" 
-			}
-			echo "</table>";
-		} */
-
-
 OCILogoff($db_conn);
 }
 
-if(isset($_POST['login']))   // it checks whether the user clicked login button or not 
+if(isset($_POST['slogin']))   // it checks whether the user clicked login button or not 
 {
      $user = $_POST['user'];
      $pass = $_POST['pass'];
+/*
+     $staff = executePlainSQL("select sin from staff where sin = '".$user."'");
+     if (!is_null($staff)){
+     	$staff = executePlainSQL("select sin from manager where sin = '".$user."' AND pw = '".$pass"'");
 
+     }else{
+     	echo "Invalid username or password";
+     } 
+*/
       if($user == "manager" && $pass == "m123")    
          {                                       
 
           $_SESSION['use']=$user;
 
-         echo '<script type="text/javascript"> window.open("manhome.php","_self");</script>';            
+         echo '<script type="text/javascript"> window.open("manhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
 
         }
       if($user == "username" && $pass == "c123")    
@@ -239,7 +224,7 @@ if(isset($_POST['login']))   // it checks whether the user clicked login button 
 
           $_SESSION['use']=$user;
 
-         echo '<script type="text/javascript"> window.open("custhome.php","_self");</script>';            
+         echo '<script type="text/javascript"> window.open("custhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
 
         }
         if($user == "waiter" && $pass == "w123")    
@@ -247,7 +232,7 @@ if(isset($_POST['login']))   // it checks whether the user clicked login button 
 
           $_SESSION['use']=$user;
 
-         echo '<script type="text/javascript"> window.open("waithome.php","_self");</script>';            
+         echo '<script type="text/javascript"> window.open("waithome.php","_self");</script>';            //  On Successfull Login redirects to home.php
 
         }
         if($user == "chef" && $pass == "ch123")    
@@ -255,7 +240,7 @@ if(isset($_POST['login']))   // it checks whether the user clicked login button 
 
           $_SESSION['use']=$user;
 
-         echo '<script type="text/javascript"> window.open("chefhome.php","_self");</script>';            
+         echo '<script type="text/javascript"> window.open("chefhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
 
         }
 
