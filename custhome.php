@@ -7,7 +7,7 @@
 <p> Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostalCode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rating&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date</p>
 <form method="POST" action="custhome.php">
 <!--refresh page when submit-->
-   <p><input type="text" name="namereview" size="6"><input type="text" name="pcreview" size="6"><input type="text" name="ratingreview" size="6"><input type="text" name="datereview" size="6"><br><br>Comment<br><input type="text" name="commentreview" size="6" style="width:200px; height:200px;">
+   <p><input type="text" name="namereviews" size="6"><input type="text" name="pcreview" size="6"><input type="text" name="ratingreview" size="6"><input type="text" name="datereview" size="6"><br><br>Comment<br><input type="text" name="commentreview" size="6" style="width:200px; height:200px;">
 <!--define variables to pass the value-->      
 <br><br><input type="submit" value="Submit Review" name="submitreview"></p>
 </form>
@@ -22,6 +22,14 @@
 <input type="submit" value="Search" name="searchforreviews"></p>
 </form>
 
+<p>Find all reviews for a restaurant chain: </p>
+<p><font size="2"> Restaurant Chain: </font></p>
+<form method="POST" action="custhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="namereview" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="searchforallreviews"></p>
+</form>
 
 
 <?php
@@ -93,47 +101,38 @@ function executeBoundSQL($cmdstr, $list) {
 
 
 if ($db_conn){
-/*
-	$result = executePlainSQL("select * from reviews");
-	echo "<br>Got data from table Reviews:<br>";
-	echo "<table>";
-	echo "<tr><th>ID</th><th>Name</th></tr>";
 
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["POSTALCODE"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["PDATE"] . "</td><td>" . $row["COMMENT"] . "</td></tr>"; //or just use "echo $row[0]"
-		//echo $row[0]; 
-	}
-	echo "</table>";
-
-*/
 	if (array_key_exists('submitreview', $_POST)){
-	$tuple = array (
-			":bind1" => $_POST['namereview'],
-			":bind2" => $_POST['pcreview'],
-			":bind3" => $_POST['ratingreview'],
-			":bind4" => $_POST['datereview'],
-			":bind5" => $_POST['commentreview']
-		);
-		$alltuples = array (
-			$tuple
-		);
 
-		executeBoundSQL("insert into reviews values (:bind1, :bind2, :bind3, :bind4, :bind5)", $alltuples);
+		executePlainSQL("insert into review values ('".$_POST['namereviews']."', '".$_POST['pcreview']."', '".$_POST['ratingreview']."', '".$_POST['datereview']."' , '".$_POST['commentreview']."')");
 		executePlainSQL("UPDATE Branch SET av_rating = (SELECT AVG(rating) FROM Reviews WHERE pc = v_rpc GROUP BY pc)");
 
 		OCICommit($db_conn);
 	} else
 	if (array_key_exists('searchforreviews', $_POST)){
-		$tuple = array (
-				":bind1" => $_POST['addressreview'],
-				":bind2" => $_POST['cityreview']
-			);
-			$alltuples = array (
-				$tuple
-			);
-		executeBoundSQL("select r.username, r.rating, r.comments from reviews r where r.pc = (select b.pc from branches where b.addr = :bind1 and b.city = :bind2)", $alltuples);
-		//print
+	$result = executePlainSQL("select r.username, r.rating, R.P_DATE, r.comment from review r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."')");
+	echo "<table>";
+	echo "<tr><th>Name</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["COMMENT"] . "</td></tr>"; 
+	}
+	echo "</table>";
+
 		OCICommit($db_conn);
+	}else 
+
+	if(array_key_exists ("searchforallreviews", $_POST)){
+	$result = executePlainSQL("select * from reviews where pc = (select pc from branch where name = '".$_POST['namereview']."' ");
+	echo "<table>";
+	echo "<tr><th>Name</th><th>Postal Code</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["PC"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["COMMENT"] . "</td></tr>"; 
+	}
+	echo "</table>";
+
+	OCICommit($db_conn);
 	}
 
 
