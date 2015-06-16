@@ -6,23 +6,23 @@
 <br><br>
 
 <p><b>Find Staff:</b></p>
-<p> <input type='submit' name='slist' value='View staff list'></p>
-<form action="" method='post'> 
+<p> <input type='submit' name='fs_list' value='View staff list'></p>
+<form action="manhome.php" method='post'> 
 <p> <font size='2'>SIN: </font><input type='text' name='fs_SIN'>
-	<input type='submit' name='subsSIN' value='Find'>
+	<input type='submit' name='sub_fs_SIN' value='Find'>
 </p>
 <p> <font size='2'>Name: </font><input type='text' name='fs_name'>
-	<input type='submit' name='subsname' value='Find'>
+	<input type='submit' name='sub_fs_name' value='Find'>
 </p>
-<p> <font size='2'> Branch: </font><input type='text' name='fs_branch'>
-	<input type='submit' name='subsbranch' value='Find'>
+<p> <font size='2'>Branch: </font><input type='text' name='fs_branch'>
+	<input type='submit' name='sub_fs_branch' value='Find'>
 </p>
 </form>
 
 <br><br>
 
 <p><b>Add Staff:</b></p>
-<form action='' method='post'>
+<form action='manhome.php' method='post'>
 	<p>
 		<input type='text' name='as_name' value='Name'>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -55,12 +55,12 @@
 <br><br>
 
 <p><b>Edit Staff Info:</b></p>
-<form action='' method='post'>
+<form action='manhome.php' method='post'>
 	<p>
 		<p><font size='2'>SIN: </font> <input type='text' name='es_sin'></p>
 		<p><font size='2'>Supervisor: </font>
 			<input type='text' name='es_supervisor' value='SIN'>
-			<input type='radio' name='sub_es_supervisor' value='Add'><font size='2'>Add</font>
+			<input type='radio' name='sub_es_supervisor' value='Add'><font size='2'>Remove</font>
 			<input type='radio' name='sub_es_supervisor' value='Remove'><font size='2'>Add</font>
 		</p>
 		<p><font size='2'>Supervisee: </font>
@@ -83,7 +83,43 @@
 	</p>
 </form>
 
+<font size='3'>Set the salary of the staff whose pay is higher than the average to be the average.</font>
+<input type='submit' name='sub_es_avsal' value='Set'>
+<br><br>
+<form action='manhome.php' method='post'>
+<font size='3'>Transfer all the staff members that have worked at <input type='text' name='es_transfer' value='Branch Postal Code'> but no longer work there to that branch in their current positions.</font>
+<input type='submit' name='sub_es_transfer' value='Transfer'>
+</form><br>
+<font size='3'>Find the waiter with the highest pay and make him supervise all the other waiters</font>
+<input type='submit' name='sub_es_supall' value='Set'>
+<br><br><br>
 
+<p><b>Update Branch Info:</b></p>
+<form action='manhome.php' method='post'>
+	<input type='text' name='ub_branch' value='Branch Postal Code'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type='text' name='ub_budget' value='Budget'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type='text' name='ub_pfmce' value='Performance'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type='submit' name='sub_ub' value='Update'>
+</form>
+<br><br>
+
+<p><b>Others:</b></p>
+<form action='manhome.php' method='post'>
+<font size='3'>Compare performances of managers managing branches of</font>
+<input type='text' name='o_compare' value='Restaurant Name'>
+<input type='submit' name='sub_o_compare' value='Compare'></form><br>
+
+<form action='manhome.php' method='post'>
+<font size='3'>Find the most popular dishes:</font><br>
+<input type='text' name='o_pop_res' value='Restaurant Name'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input type='text' name='o_pop_reg' value='City or Province'>
+<input type='submit' name='sub_o_pop' value='Search'></form><br>
+
+<form action='manhome.php' method='post'>
+<font size='3'>Count the number of customers that have visited
+	<input type='text' name='o_cust_br' value='Branch Postal Code'>
+	on <input type='text' name='o_cust_date' value='Date in yyyymmdd'></font>
+<input type='submit' name='sub_o_cust' value='Submit'></form><br>
 
 <!-- 
 
@@ -101,8 +137,6 @@ EDIT STAFF
 - add supervisee/remove supervisee
 - move staff to another pos (change WA and HWA)
 - change shifts and schedule
-
-///////////////////
 - set the salary of the staff whose pay is higher than the average to be the average
 - transfer all the staff members that have worked at a specific branch but no longer work there to that branch in their current positions
 - Find the waiter with the highest pay and make him supervise all the other waiters
@@ -188,8 +222,105 @@ function executeBoundSQL($cmdstr, $list) {
 
 }
 
-
+$login = $_POST['user'];
 if ($db_conn){
+	if (array_key_exists('sub_fs_list', $_POST)){
+		/* View staff list
+ 		 * - return a list of staff (sin, name, branch)
+	 	 * - 1 query
+	 	 */
+
+	} else if (array_key_exists('sub_fs_SIN', $_POST)){
+/* Find staff by sin
+	 * - args(sin)
+	 * - return staff with that sin (sin, name, branch)
+	 * - 1 query
+	 */
+	} else if (array_key_exists('sub_fs_name', $_POST)) {
+
+/* Find staff by Name
+	 * - args(name)
+	 * - return list of staff with that name (sin, name, branch)
+	 * - 1 query
+	 */
+		$name = $_POST['fs_name'];
+		$result = executePlainSQL('select name, sin from staff s, worksat w where name=&name! and s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!);');
+	
+	} else if (array_key_exists('sub_fs_branch', $_POST)) {
+/* Find staff by branch
+	 * - args(branch pc)
+	 * - return list of staff working at the branch (sin, name, branch)
+	 * - 1 query
+	 */		
+	} else if (array_key_exists('sub_as', $_POST)) {
+/* Add staff
+	 * - args(name, sin, pw, pc, pos, sal, avail, sch, sdate)
+	 * - add new tuple to Staff and WorksAt
+	 * - 2 queries
+	 */		
+	} else if (array_key_exists('sub_ds', $_POST)) {
+/* Delete Staff
+	 * - args(sin)
+	 * - add one tuple to HWA using info from WA
+	 * - delete a tuple from chef/manager/waiter if used to be one of them 
+	 * - delete a tuple from WA
+	 * - 2-3 queries
+	 */		
+	} else if (array_key_exists('sub_es', $_POST)) {
+/* Edit Staff
+	 * - args() --> a lot
+	 * - store sin
+	 * - check each op one by one --> perform op if input not null   !!! no input == null????
+	 *   - supervisor sin, add/remove
+	 *   - supervisee, add/remove
+	 *   - new pos
+	 *   - new schedule
+	 *   - set sal
+	 *   - transfer
+	 *   - supervise all
+	 * - 9 queries, 11 if's (ish)
+	 */		
+	} else if (array_key_exists('sub_es_avsal', $_POST)) {
+/* set sal
+ * - no args
+ * - 1 query
+ */
+		
+	} else if (array_key_exists('sub_es_transfer', $_POST)) {
+/* transfer
+ * - args(branch)
+ * - 1 query
+ */		
+	} else if (array_key_exists('sub_es_supall', $_POST)) {
+/* supervise all
+ * - no args
+ * - 1 query
+ */		
+	} else if (array_key_exists('sub_ub', $_POST)) {
+/* Update Branch
+	 * - args(pc, budget, performance)
+	 * - update a tuple in Branch
+	 * - 1 query
+	 */		
+	} else if (array_key_exists('sub_o_compare', $_POST)) {
+/* Compare performances
+	 * - args(restaurant)
+	 * - return a list of performances, managers, branches ordered by performance
+	 * - 1 query
+	 */		
+	} else if (array_key_exists('sub_o_pop', $_POST)) {
+/* Find the most popular dishes
+	 * - args(restaurant, region)
+	 * - assume region is province --> if null assume region is city 
+	 * - 2 queries; 1 if
+	 */		
+	} else if (array_key_exists('sub_o_cust', $_POST)) {
+/* Count #cust
+	 * - args(pc, date)
+	 * - return a num, branch, date
+	 * - 1 query */		
+	}
+	
 
 OCILogoff($db_conn);
 }
