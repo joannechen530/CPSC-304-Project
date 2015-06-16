@@ -2,7 +2,7 @@
 <html> 
 <body>
 <p><font size='6'> MANAGER </font></p>
-
+<p> testing <?php echo $_SESSION['use'] ?> </p> 
 <br><br>
 
 <p><b>Find Staff:</b></p>
@@ -121,43 +121,13 @@
 	on <input type='text' name='o_cust_date' value='Date in yyyymmdd'></font>
 <input type='submit' name='sub_o_cust' value='Submit'></form><br>
 
-<!-- 
-
-FIND STAFF (return name, sin, WA and HWA, shifts/schedule/certificates)
-- staff list
-- by name
-- by sin
-- by branch pc
-- add staff (ADD WA)
-- delete staff (move WA to HWA)
-
-EDIT STAFF
-- enter sin 
-- add supervisor/remove supervisor
-- add supervisee/remove supervisee
-- move staff to another pos (change WA and HWA)
-- change shifts and schedule
-- set the salary of the staff whose pay is higher than the average to be the average
-- transfer all the staff members that have worked at a specific branch but no longer work there to that branch in their current positions
-- Find the waiter with the highest pay and make him supervise all the other waiters
-
-OTHERS
-- compare performances
-- Find the most popular dishes of a restaurant in a region (city or province)
-- Find and count all the users that have visited a branch on a specific day
-- Find and compare the performances of other managers of a given restaurant
-
-UPDATE BRANCH:
-- update budget and performance (branch, budge, performance)
-
---> 
 
 
 
 
 <?php
 $db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
-
+$login = $_POST["user"];
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -224,18 +194,17 @@ function executeBoundSQL($cmdstr, $list) {
 
 $login = $_POST['user'];
 if ($db_conn){
+	// View staff list (sin, name, branch)
 	if (array_key_exists('sub_fs_list', $_POST)){
-		/* View staff list
- 		 * - return a list of staff (sin, name, branch)
-	 	 * - 1 query
-	 	 */
-
+		$result = executePlainSQL('select sin, name, pc from staff s, worksat w where s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!) order by sin;');
 	} else if (array_key_exists('sub_fs_SIN', $_POST)){
 /* Find staff by sin
 	 * - args(sin)
 	 * - return staff with that sin (sin, name, branch)
 	 * - 1 query
 	 */
+		$sin = $_POST['fs_SIN'];
+		$result = executePlainSQL('select sin, name, pc from Staff s, WorksAt w where s.ssin=$sin! and s.sin=w.sin and w.pc in (select pc from WorksAt where sin=$login!) order by sin;');
 	} else if (array_key_exists('sub_fs_name', $_POST)) {
 
 /* Find staff by Name
@@ -244,7 +213,7 @@ if ($db_conn){
 	 * - 1 query
 	 */
 		$name = $_POST['fs_name'];
-		$result = executePlainSQL('select name, sin from staff s, worksat w where name=&name! and s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!);');
+		$result = executePlainSQL('select sin, name, pc from staff s, worksat w where name=&name! and s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!) order by sin;');
 	
 	} else if (array_key_exists('sub_fs_branch', $_POST)) {
 /* Find staff by branch
@@ -252,6 +221,8 @@ if ($db_conn){
 	 * - return list of staff working at the branch (sin, name, branch)
 	 * - 1 query
 	 */		
+		$pc = $_POST['fs_branch'];
+		$result = executePlainSQL('select sin, name, pc from Staff s, WorksAt w where s.sin=w.sin and w.pc=$pc! and w.pc in (select pc from WorksAt where sin=$login!) order by sin;');
 	} else if (array_key_exists('sub_as', $_POST)) {
 /* Add staff
 	 * - args(name, sin, pw, pc, pos, sal, avail, sch, sdate)
