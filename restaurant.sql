@@ -7,6 +7,8 @@ drop table Waiter;
 drop table Chef;
 drop table Supervises;
 drop table Restaurant;
+drop table Branch_city;
+drop table Branch_prov;
 drop table Branch;
 drop table SellsDish;
 drop table WorksAt;
@@ -342,11 +344,41 @@ values('Peaceful', 'Chinese', '2011-11-11');
 
 --Branch
 
+insert into Branch_city
+values('V1V 1V2', 'Toast');
+
+insert into Branch_city
+values('V5E 2T2', 'Pukwana Beach');
+
+insert into Branch_city
+values('V8R 2T5', 'Indianbone');
+
+insert into Branch_city
+values('S4V 9F9', 'Telegraph');
+
+insert into Branch_city
+values('S6B 7W5', 'Grimshaw');
+
+insert into Branch_prov
+values('V1V 1V2', 'QC');
+
+insert into Branch_prov
+values('V5E 2T2', 'BC');
+
+insert into Branch_prov
+values('V8R 2T5', 'BC');
+
+insert into Branch_prov
+values('S4V 9F9', 'BC');
+
+insert into Branch_prov
+values('S6B 7W5', 'NS');
+
 insert into Branch
 values('V1V 1V2', '1010 Main Str', 20080114, 4, 6135302998, 70, 'Le Crocodile', 123123123, 4, 9999);
 
 insert into Branch
-values('V5E 2T2', '1010 Main Str', 20030520, 5, 2342365345, 30, 'Sushi Town', 249585833, 4, 6000);
+values('V5E 2T2', '6218 Red Bay', 20030520, 5, 2342365345, 30, 'Sushi Town', 249585833, 4, 6000);
 
 insert into Branch
 values('V8R 2T5', '891 Clear Gate Acres', 20051204, 4, 3453432121, 120, 'McDonald’s', 112312332, 3, 7000);
@@ -355,7 +387,7 @@ insert into Branch
 values('S4V 9F9', '742 Rustic Street', 20080821, 3, 5667778342, 240, 'Peaceful', 301929393, 3, 4000);
 
 insert into Branch
-values('S6B 7W5', '1010 Main Str', 2010101, 2, 1341345645, 40, 'Peaceful', 201010203, 2, 2500);
+values('S6B 7W5', '254 Thunder Rise', 2010101, 2, 1341345645, 40, 'Peaceful', 201010203, 2, 2500);
 
 
 --SellsDish
