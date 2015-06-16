@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html> 
 <body>
-<p>Staff</p>
+<p>Wait Staff</p>
 
 <p>Find my info: </p>
 <p><font size="2"> SIN</font></p>
@@ -30,7 +30,23 @@
 <input type="submit" value="Search" name="supervisor"></p>
 </form>
 
+<p>Find employees with a certain supervisor:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinsuperem" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="supervisoremployees"></p>
+</form>
 
+<p>Find work schedule:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinshifts" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Find" name="findshifts"></p>
+</form>
 
 
 <?php
@@ -104,38 +120,65 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){
-		$tuple = array (
-				":bind1" => $_POST['sininfo']
-			);
-			$alltuples = array (
-				$tuple
-			);
-		executeBoundSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = :bind1");
-		//print
+	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
+	echo "<table>";
+	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+	}
+	echo "</table>";
+
 		OCICommit($db_conn);
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
-	$tuple = array (
-			":bind1" => $_POST['sinavail'],
-			":bind2" => $_POST['avail']
-		);
-		$alltuples = array (
-			$tuple
-		);
-	executeBoundSQL("UPDATE Staff SET availability = :bind2 WHERE sin = :bind1;");
+	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
+	echo "Availability changed.";
+	OCICommit($db_conn);
 	} else
 
 	if (array_key_exists('supervisor', $_POST)){
-	$tuple = array (
-			":bind1" => $_POST['sinsuper']
-		);
-		$alltuples = array (
-			$tuple
-		);
-	executeBoundSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = :bind1)");	
+	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
+	//print
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
 	}
-	
+	echo "</table>";
+	OCICommit($db_conn);
+
+	} else
+
+	if (array_key_exists('supervisoremployees', $_POST)){
+
+	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");
+	//print		
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else 
+
+	if (array_key_exists('findshifts', $_POST)){
+	$result = executePlainSQL("select shifts from waiter where sin = '".$_POST['sinshifts']."'");
+	//print		
+	echo "<table>";
+	echo "<tr><th>Shifts</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["SHIFTS"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	}
+
 
 
 OCILogoff($db_conn);
