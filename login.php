@@ -323,36 +323,38 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
       if($user == "manager" && $pass == "m123")    
          {                                       
 
-          $_SESSION['use']=$user;
-
-         echo '<script type="text/javascript"> window.open("manhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
-
-        }
-      if($user == "username" && $pass == "c123")    
-         {                                       
-
-          $_SESSION['use']=$user;
-
-         echo '<script type="text/javascript"> window.open("custhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
+        setcookie("username", $user);
+		header("location:manhome.php");
+           //  On Successfull Login redirects to home.php
 
         }
-        if($user == "waiter" && $pass == "w123")    
+      else if($user == "username" && $pass == "c123")    
          {                                       
 
-          $_SESSION['use']=$user;
-
-         echo '<script type="text/javascript"> window.open("waithome.php","_self");</script>';            //  On Successfull Login redirects to home.php
+        setcookie("username", $user);
+		header("location:custhome.php");           //  On Successfull Login redirects to home.php
 
         }
-        if($user == "chef" && $pass == "ch123")    
+        else if($user == "waiter" && $pass == "w123")    
          {                                       
 
-          $_SESSION['use']=$user;
+          setcookie("username", $user);
+		header("location:waithome.php");           //  On Successfull Login redirects to home.php
+
+        }
+        else if($user == "chef" && $pass == "ch123")    
+         {                                       
+
+          setcookie("username", $user);
+		header("location:chefhome.php");
 
          echo '<script type="text/javascript"> window.open("chefhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
 
-        }
+        } else if ($user == "staff" && $pass == "s123") {
 
+        setcookie("username", $user);
+		header("location:genstaffhome.php");
+		}
         else
         {
             echo "Invalid UserName or Password";        
