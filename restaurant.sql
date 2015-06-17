@@ -70,20 +70,6 @@ CREATE TABLE Restaurant
 
 grant select on Restaurant to public;
 
-CREATE TABLE Branch_city
-	(pc CHAR(7),
-	city CHAR(20),
-	PRIMARY KEY (pc));
-	
-grant select on Branch_city to public;
-
-CREATE TABLE Branch_prov
-	(pc CHAR(7),
-	province CHAR(20),
-	PRIMARY KEY (pc));
-		
-grant select on Branch_prov to public;
-
 CREATE TABLE Branch
 	(pc CHAR(7),
 	addr CHAR(50),
@@ -102,6 +88,22 @@ CREATE TABLE Branch
   		ON DELETE CASCADE);
 		
 grant select on Branch to public;
+
+CREATE TABLE Branch_city
+	(pc CHAR(7),
+	city CHAR(20),
+	PRIMARY KEY (pc),
+	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+	
+grant select on Branch_city to public;
+
+CREATE TABLE Branch_prov
+	(pc CHAR(7),
+	province CHAR(20),
+	PRIMARY KEY (pc),
+	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+		
+grant select on Branch_prov to public;
 
 CREATE TABLE SellsDish
 	(rname CHAR(50) not null,
