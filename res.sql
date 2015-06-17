@@ -104,12 +104,12 @@ CREATE TABLE Branch
 grant select on Branch to public;
 
 CREATE TABLE SellsDish
-	(restaurant_name CHAR(200) not null,
-	dish_name CHAR(200) not null,
+	(rname CHAR(200) not null,
+	dname CHAR(200) not null,
 	price INT null,
 	popularity INT null,
-	PRIMARY KEY (restaurant_name, dish_name),
-	FOREIGN KEY (restaurant_name) REFERENCES Restaurant (name) 
+	PRIMARY KEY (rname, dish_name),
+	FOREIGN KEY (rname) REFERENCES Restaurant (name) 
 		ON DELETE CASCADE);
  
 grant select on SellsDish to public;
@@ -146,7 +146,8 @@ grant select on HasWorkedAt to public;
 CREATE TABLE Visits
 	(username CHAR(20),
 	pc CHAR(7) NOT NULL,
-	v_date INT,	
+	v_date INT,
+	num INT, 
 	PRIMARY KEY(username,pc),
 	FOREIGN KEY(username) REFERENCES Customer ON DELETE CASCADE,
 	FOREIGN KEY(pc) REFERENCES Branch ON DELETE cascade);
@@ -432,22 +433,22 @@ values(229604950, 'S4V 9F9', 20110921, 20120101, 'Chef', 12);
 --Visits
 
 insert into Visits
-values('TheEater56', 'V5E 2T2', 20120330);
+values('TheEater56', 'V5E 2T2', 20120330, 5);
 
 insert into Visits
-values('TheEater56', 'V5E 2T2', 20110909);
+values('TheEater56', 'V5E 2T2', 20110909, 4);
 
 insert into Visits
-values('TheEater56', 'S4V 9F9', 20140520);
+values('TheEater56', 'S4V 9F9', 20140520, 3);
 
 insert into Visits
-values('CheeseBurgo', 'V8R 2T5', 20081230);
+values('CheeseBurgo', 'V8R 2T5', 20081230, 3);
 
 insert into Visits
-values('user3333', 'V1V 1V2', 20130511);
+values('user3333', 'V1V 1V2', 20130511, 2);
 
 insert into Visits
-values('FoodieFoo', 'V1V 1V2', 20130511);
+values('FoodieFoo', 'V1V 1V2', 20130511, 10);
 
 
 --Review
