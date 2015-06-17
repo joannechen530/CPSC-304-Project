@@ -1,20 +1,19 @@
 --Initializing (drop tables)
-
-drop table Customer;
-drop table Staff;
-drop table Manager;
-drop table Waiter;
-drop table Chef;
-drop table Supervises;
-drop table Restaurant;
-drop table Branch_city;
-drop table Branch_prov;
-drop table Branch;
-drop table SellsDish;
-drop table WorksAt;
-drop table HasWorkedAt;
-drop table Visits;
 drop table Review;
+drop table Visits;
+drop table HasWorkedAt;
+drop table WorksAt;
+drop table SellsDish;
+drop table Branch;
+drop table Branch_prov;
+drop table Branch_city;
+drop table Restaurant;
+drop table Supervises;
+drop table Chef;
+drop table Waiter;
+drop table Manager;
+drop table Staff;
+drop table Customer;
 
 ---------------------------------------
 --Create tables
