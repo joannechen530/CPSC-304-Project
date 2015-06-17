@@ -16,13 +16,13 @@ Password: <input type="text" name="cpass"><br>
 <br><br><br><br><br><br><br><br>
 
 
-<p>Find all branches (In a province or city) </p>
-<p><font size="2"> Restaurant Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Province&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;City </font></p>
+<p>Find all branches</p>
+<p><font size="2"> Restaurant Name *&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Province&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;City </font></p>
 <form method="POST" action="login.php">
 <!--refresh page when submit-->
    <p><input type="text" name="rnamebranches" size="6"><input type="text" name="provincebranches" size="6"><input type="text" name="citybranches" size="6">
 <!--define variables to pass the value-->      
-<input type="submit" value="Search for branches by city" name="searchforbranchesincity"><br>
+<input type="submit" value="Search" name="searchforbranchesincity"><br>
 </form>
 
 
@@ -62,13 +62,16 @@ Password: <input type="text" name="cpass"><br>
 
 <?php
 $success = True; //keep track of errors so it redirects the page only if there are no errors
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
-
+//$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
+$db_conn = OCI_Connect("ora_r1b9", "a35876135", "ug");
+if ($db_conn == false){
+	echo "cannot connect to db \n";
+}
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
 	global $db_conn, $success;
-	$statement = OCIParse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
+	$statement = OCI_parse($db_conn, $cmdstr); //There is a set of comments at the end of the file that describe some of the OCI specific functions and how they work
 
 	if (!$statement) {
 		echo "<br>Cannot parse the following command: " . $cmdstr . "<br>";
@@ -78,7 +81,7 @@ function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL com
 		$success = False;
 	}
 
-	$r = OCIExecute($statement, OCI_DEFAULT);
+	$r = OCI_Execute($statement, OCI_DEFAULT);
 	if (!$r) {
 		echo "<br>Cannot execute the following command: " . $cmdstr . "<br>";
 		$e = oci_error($statement); // For OCIExecute errors pass the statementhandle
@@ -133,57 +136,95 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('searchforbranchesincity', $_POST)){
-			$result = executePlainSQL("select addr, city, province, phone, av_rating from branches where name ='".$_POST['rnamebranches']."' and city = '".$_POST['citybranches']."' and province ='".$_POST['provincebranches']."'");
+		if (trim($_POST['citybranches']) == "" && trim($_POST['provincebranches']) == ""){
+			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."'";
+			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
 			echo "<tr><th>Address</th><th>City</th><th>Province</th><th>Phone</th><th>Rating</th></tr>";
-
-			while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
 				echo "<tr><td>" . $row["ADDR"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["AV_RATING"] . "</td></tr>";  
 			}
 			echo "</table>";
-			
-
-	}else 
-	if (array_key_exists('searchforallbranches', $_POST)){
-		$tuple = array (
-				":bind1" => $_POST['rnamebranches']
-
-			);
-			$alltuples = array (
-				$tuple
-			);
-			executeBoundSQL("select addr, city, province, phone, av_rating, s_date, capacity  from Branches where :bind1 = name order by av_rating", $alltuples);
-
 			OCICommit($db_conn);
+		} else 
+		if (trim($_POST['citybranches']) == ""){
+			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'";
+			$result = executePlainSQL($statement);
+			echo "<br>Got data from table Branches:<br>";
+			echo "<table>";
+			echo "<tr><th>Address</th><th>City</th><th>Province</th><th>Phone</th><th>Rating</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["ADDR"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["AV_RATING"] . "</td></tr>";  
+			}
+			echo "</table>";
+		} else
+			if (trim($_POST['provincebranches']) == ""){
+			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'";
+			$result = executePlainSQL($statement);
+			echo "<br>Got data from table Branches:<br>";
+			echo "<table>";
+			echo "<tr><th>Address</th><th>City</th><th>Province</th><th>Phone</th><th>Rating</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["ADDR"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["AV_RATING"] . "</td></tr>";  
+			}
+			echo "</table>";
+		} else {
+			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."' AND PROVINCE = '".$_POST['provincebranches']."' ";
+			$result = executePlainSQL($statement);
+			echo "<br>Got data from table Branches:<br>";
+			echo "<table>";
+			echo "<tr><th>Address</th><th>City</th><th>Province</th><th>Phone</th><th>Rating</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["ADDR"] . "</td><td>" . $row["CITY"] . "</td><td>" . $row["PROVINCE"] . "</td><td>" . $row["PHONE"] . "</td><td>" . $row["AV_RATING"] . "</td></tr>";  
+			}
+			echo "</table>";
+		}
+
+
 	} else
 		if (array_key_exists('searchforrest', $_POST)){
-		$tuple = array (
-				":bind1" => $_POST['rnameinfo']
 
-			);
-			$alltuples = array (
-				$tuple
-			);
-		executeBoundSQL("select rname, type, s_date from Restaurant where rname=restaurant;", $alltuples);
+		$result = executePlainSQL("SELECT rname, type, s_date from Restaurant where rname = '".$_POST['rnameinfo']."';");
+			echo "<br>Got data from table Restaurant::<br>";
+			echo "<table>";
+			echo "<tr><th>Restaurant Name:</th><th>Type:</th><th>Founding Date</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["RNAME"] . "</td><td>" . $row["TYPE"] . "</td><td>" . $row["S_DATE"] . "</td></tr>";  
+			}
+			echo "</table>";
+			OCICommit($db_conn);
+
 		OCICommit($db_conn);
 	} else
 
 	if (array_key_exists('searchfordishes', $_POST)){
-		$tuple = array (
-				":bind1" => $_POST['rnamedishes']
 
-			);
-			$alltuples = array (
-				$tuple
-			);
-		executeBoundSQL("select dname, price, popularity FROM SellsDish WHERE rname=:bind1", $alltuples);
+		$result = executePlainSQL("SELECT dname, price, popularity FROM SellsDish WHERE rname=:'".$_POST['rnamedishes']."'");
+			echo "<table>";
+			echo "<tr><th>Dish:</th><th>Price:</th><th>Popularity</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["DNAME"] . "</td><td>" . $row["PRICE"] . "</td><td>" . $row["POPULARITY"] . "</td></tr>";  
+			}
+			echo "</table>";
+
 		OCICommit($db_conn);
 	} else 
 
 	if (array_key_exists('searchforreviews', $_POST)){
-		$result = executePlainSQL("select r.username, r.rating, r.comments from reviews r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."'')");
-		echo "<br>Got data from table Reviews:<br>";
+		$result = executePlainSQL("SELECT r.username, r.rating, r.comments from reviews r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."'')");
 			echo "<table>";
 			echo "<tr><th>Username</th><th>Rating</th><th>Comment</th></tr>";
 
