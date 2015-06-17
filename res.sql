@@ -86,7 +86,7 @@ grant select on Branch_prov to public;
 CREATE TABLE Branch
 	(pc CHAR(7),
 	addr CHAR(50),
-	s_date DATE,
+	s_date INT,
 	av_rating INT,
 	phone CHAR(10),
 	capacity INT,
