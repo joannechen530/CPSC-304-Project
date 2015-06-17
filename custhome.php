@@ -39,7 +39,7 @@ echo $login;
 
 
 <?php
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
+$db_conn = OCILogon("ora_y2q8", "a33104126", "ug");
 
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
@@ -123,7 +123,7 @@ if ($db_conn){
 	echo "<tr><th>Name</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["COMMENT"] . "</td></tr>"; 
+		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["RCOMMENT"] . "</td></tr>"; 
 	}
 	echo "</table>";
 
@@ -133,10 +133,11 @@ if ($db_conn){
 	if(array_key_exists ("searchforallreviews", $_POST)){
 	$result = executePlainSQL("SELECT * from review where pc = (select pc from branch where bname = '".$_POST['namereview']."') ");
 	echo "<table>";
-	echo "<tr><th>Name</th><th>Postal Code</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
+	echo "<tr><th>Username</th><th>Postal Code</th><th><Rating</th><th>Posting Date</th><th>Comment</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["PC"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["COMMENT"] . "</td></tr>"; 
+		echo "bla";
+		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["PC"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["RCOMMENT"] . "</td></tr>"; 
 	}
 	echo "</table>";
 
