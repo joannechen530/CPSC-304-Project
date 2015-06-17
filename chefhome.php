@@ -75,6 +75,84 @@ function executeBoundSQL($cmdstr, $list) {
 
 if ($db_conn){
 
+	if (array_key_exists('findmyinfo', $_POST)){
+	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) < 9){
+	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
+	echo "<table>";
+	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+	}
+	echo "</table>";
+
+		OCICommit($db_conn);
+	}else {echo "Invalid Inputs";}
+
+	} else
+
+	if (array_key_exists('updateavail', $_POST)){
+	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) < 9){
+	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
+	echo "Availability changed.";
+	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+
+	} else
+
+	if (array_key_exists('supervisor', $_POST)){
+	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) < 9){
+	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
+	//print
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else{echo "Invalid Inputs";}
+
+	} else
+
+	if (array_key_exists('supervisoremployees', $_POST)){
+	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) < 9){
+	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+	} else 
+
+	if (array_key_exists('findshifts', $_POST)){
+	if(is_numeric($_POST['sinshifts']) && strlen($_POST['sinshifts']) < 9){
+	$result = executePlainSQL("select schedule from chef where sin = '".$_POST['sinshifts']."'");	
+	echo "<table>";
+	echo "<tr><th>Schedule</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["SCHEDULE"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else {echo "Invalid Input";}
+
+	} else 
+	if (array_key_exists('updatecert', $_POST)){
+	if(is_numeric($_POST['sincert']) && strlen($_POST['sincert']) < 9){
+	executePlainSQL("UPDATE Chef SET certificates = '".$_POST['cert']."' WHERE sin = '".$_POST['sincert']."';");
+	echo "Ceertificates changed.";
+	OCICommit($db_conn);
+	}else {echo "Invalid Input";}
+	}
+
+
 OCILogoff($db_conn);
 }
  ?>
