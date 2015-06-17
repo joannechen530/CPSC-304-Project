@@ -11,7 +11,7 @@ echo $login;
 
 <p>Find my info: </p>
 <p><font size="2"> SIN</font></p>
-<form method="POST" action="waithome.php">
+<form method="POST" action="genstaffhome.php">
 <!--refresh page when submit-->
    <p><input type="text" name="sininfo" size="6">
 <!--define variable to pass the value-->      
@@ -20,7 +20,7 @@ echo $login;
 
 <p>Update Availability:</p>
 <p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
-<form method="POST" action="waithome.php">
+<form method="POST" action="genstaffhome.php">
 <!--refresh page when submit-->
    <p><input type="text" name="sinavail" size="6"><input type="text" name="avail" size="6">
 <!--define variable to pass the value-->      
@@ -29,7 +29,7 @@ echo $login;
 
 <p>Find Supervisor:</p>
 <p><font size="2">SIN</font></p>
-<form method="POST" action="waithome.php">
+<form method="POST" action="genstaffhome.php">
 <!--refresh page when submit-->
    <p><input type="text" name="sinsuper" size="6">
 <!--define variable to pass the value-->      
@@ -38,7 +38,7 @@ echo $login;
 
 <p>Find employees with a certain supervisor:</p>
 <p><font size="2">SIN</font></p>
-<form method="POST" action="waithome.php">
+<form method="POST" action="genstaffhome.php">
 <!--refresh page when submit-->
    <p><input type="text" name="sinsuperem" size="6">
 <!--define variable to pass the value-->      
@@ -46,7 +46,7 @@ echo $login;
 </form>
 
 <?php
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
+$db_conn = OCILogon("ora_l2r8", "a32433120", "ug");
 
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
@@ -116,13 +116,13 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){
-	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) < 9){
-	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
+	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) == 9){
+	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SSIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
 	}
 	echo "</table>";
 
@@ -132,8 +132,8 @@ if ($db_conn){
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
-	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) < 9){
-	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
+	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) == 9){
+	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE ssin = '".$_POST['sinavail']."'");
 	echo "Availability changed.";
 	OCICommit($db_conn);
 	} else {echo "Invalid Inputs";}
@@ -141,24 +141,24 @@ if ($db_conn){
 	} else
 
 	if (array_key_exists('supervisor', $_POST)){
-	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) < 9){
-	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
+	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) == 9){
+	$result = executePlainSQL("select name from staff where ssin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
 	//print
 	echo "<table>";
 	echo "<tr><th>Name</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+		echo "<tr><td>" . $row["name"] . "</td></tr>"; 
 	}
 	echo "</table>";
-	OCICommit($db_conn);
+		OCICommit($db_conn);
 	} else{echo "Invalid Inputs";}
 
 	} else
 
 	if (array_key_exists('supervisoremployees', $_POST)){
-	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) < 9){
-	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) == 9){
+	$result = executePlainSQL("select name from staff where ssin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
 	echo "<table>";
 	echo "<tr><th>Name</th></tr>";
 
