@@ -36,25 +36,23 @@ CREATE TABLE Staff
 grant select on Staff to public;
 
  CREATE TABLE Manager
- 	(ssin INT not null);
+ 	(staff_ssin INT not null references staff(ssin),
+	PRIMARY KEY (staff_ssin));
  	
 grant select on Manager to public;
 
 CREATE TABLE Waiter
-	(ssin INT not null, 
+	(staff_ssin INT not null references staff(ssin), 
 	shifts CHAR(200) null,
-	PRIMARY KEY(ssin),
-	FOREIGN KEY (ssin) REFERENCES Staff (ssin) ON DELETE CASCADE);
+	PRIMARY KEY(staff_ssin));
  
 grant select on Waiter to public;
  
 CREATE TABLE Chef
-	(ssin INT not null,
+	(staff_ssin INT not null references staff(ssin),
 	schedule CHAR(200) null,
 	certificates CHAR(200) null,
-	
-	PRIMARY KEY(ssin),
-	FOREIGN KEY (ssin) REFERENCES Staff (ssin) ON DELETE CASCADE);
+	PRIMARY KEY(staff_ssin));
  
 grant select on Chef to public;
 
@@ -98,9 +96,9 @@ CREATE TABLE Branch
 	performance INT, 
 	budget INT,
 	PRIMARY KEY (pc),
-	FOREIGN KEY (bname) REFERENCES Restaurant (name) 
+	FOREIGN KEY (bname) REFERENCES Restaurant 
   		ON DELETE CASCADE,
-	FOREIGN KEY(ssin) REFERENCES Manager (ssin)
+	FOREIGN KEY(ssin) REFERENCES Manager 
   		ON DELETE CASCADE);
 		
 grant select on Branch to public;
@@ -111,7 +109,8 @@ CREATE TABLE SellsDish
 	price INT null,
 	popularity INT null,
 	PRIMARY KEY (restaurant_name, dish_name),
-	FOREIGN KEY (restaurant_name) REFERENCES Restaurant (name) ON DELETE CASCADE);
+	FOREIGN KEY (restaurant_name) REFERENCES Restaurant (name) 
+		ON DELETE CASCADE);
  
 grant select on SellsDish to public;
 
@@ -122,9 +121,9 @@ CREATE TABLE WorksAt
 	pos CHAR(50),
 	salary INT,
 	PRIMARY KEY (ssin, pc),
-	FOREIGN KEY (ssin) REFERENCES Staff (ssin)
+	FOREIGN KEY (ssin) REFERENCES Staff
   		ON DELETE CASCADE,
-	FOREIGN KEY (pc) REFERENCES Branch (pc)
+	FOREIGN KEY (pc) REFERENCES Branch
 		ON DELETE CASCADE);
 	  	
 grant select on WorksAt to public;
@@ -137,9 +136,9 @@ CREATE TABLE HasWorkedAt
 	pos CHAR(50),
 	salary INT,
 	PRIMARY KEY (ssin,pc),
-	FOREIGN KEY (ssin) REFERENCES Staff (ssin)
+	FOREIGN KEY (ssin) REFERENCES Staff
   		ON DELETE CASCADE,
-	FOREIGN KEY (pc) REFERENCES Branch (pc)
+	FOREIGN KEY (pc) REFERENCES Branch 
   		ON DELETE CASCADE);
   	
 grant select on HasWorkedAt to public;
@@ -148,11 +147,9 @@ CREATE TABLE Visits
 	(username CHAR(20),
 	pc CHAR(7) NOT NULL,
 	v_date INT,	
-	PRIMARY KEY (username,pc),
-	FOREIGN KEY (username) REFERENCES Customer (username)
-  		ON DELETE CASCADE,
-	FOREIGN KEY(pc) REFERENCES Branch (pc)
-		ON DELETE CASCADE);
+	PRIMARY KEY(username,pc),
+	FOREIGN KEY(username) REFERENCES Customer ON DELETE CASCADE,
+	FOREIGN KEY(pc) REFERENCES Branch ON DELETE cascade);
   		
 grant select on Visits to public;
  
@@ -160,13 +157,11 @@ CREATE TABLE Review
 	(username CHAR(20),
 	pc CHAR(7),
 	rating INT,
-	p_date INT,
+	p_date int,
 	rcomment CHAR(300),
-	PRIMARY KEY (username, pc),
-	FOREIGN KEY (username) REFERENCES Customer (username)
-		ON DELETE CASCADE,
-	FOREIGN KEY (pc) REFERENCES Branch (pc)
-	  	ON DELETE CASCADE);
+	PRIMARY KEY(username, pc),
+	FOREIGN KEY(username) REFERENCES Customer ON DELETE CASCADE,
+	FOREIGN KEY(pc) REFERENCES Branch ON DELETE cascade);
 		
 grant select on Review to public;
 
