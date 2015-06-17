@@ -1,14 +1,68 @@
 <!DOCTYPE HTML>
 <html> 
 <body>
-<p>Chef</p>
+<p>Cooks</p>
+
+<p>Find my info: </p>
+<p><font size="2"> SIN</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sininfo" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="findmyinfo"></p>
+</form>
+
+<p>Update Availability:</p>
+<p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinavail" size="6"><input type="text" name="avail" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Update" name="updateavail"></p>
+</form>
+
+<p>Find Supervisor:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinsuper" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="supervisor"></p>
+</form>
+
+<p>Find employees with a certain supervisor:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinsuperem" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="supervisoremployees"></p>
+</form>
+
+<p>Find work schedule:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinshifts" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Find" name="findshifts"></p>
+</form>
+
+<p>Update Certificates:</p>
+<p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Certificates</font></p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sincert" size="6"><input type="text" name="cert" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Update" name="updatecert"></p>
+</form>
 
 
-
-<?php 
+<?php
+$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
 $login = $_COOKIE["username"];
 echo $login; 
-?>
+
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -77,7 +131,6 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){
-	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) < 9){
 	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
@@ -88,21 +141,15 @@ if ($db_conn){
 	echo "</table>";
 
 		OCICommit($db_conn);
-	}else {echo "Invalid Inputs";}
-
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
-	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) < 9){
 	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
 	echo "Availability changed.";
 	OCICommit($db_conn);
-	} else {echo "Invalid Inputs";}
-
 	} else
 
 	if (array_key_exists('supervisor', $_POST)){
-	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) < 9){
 	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
 	//print
 	echo "<table>";
@@ -113,13 +160,13 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
-	} else{echo "Invalid Inputs";}
 
 	} else
 
 	if (array_key_exists('supervisoremployees', $_POST)){
-	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) < 9){
-	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+
+	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");
+	//print		
 	echo "<table>";
 	echo "<tr><th>Name</th></tr>";
 
@@ -128,12 +175,11 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
-	} else {echo "Invalid Inputs";}
 	} else 
 
 	if (array_key_exists('findshifts', $_POST)){
-	if(is_numeric($_POST['sinshifts']) && strlen($_POST['sinshifts']) < 9){
-	$result = executePlainSQL("select schedule from chef where sin = '".$_POST['sinshifts']."'");	
+	$result = executePlainSQL("select schedule from chef where sin = '".$_POST['sinshifts']."'");
+	//print		
 	echo "<table>";
 	echo "<tr><th>Schedule</th></tr>";
 
@@ -142,15 +188,11 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
-	} else {echo "Invalid Input";}
-
 	} else 
 	if (array_key_exists('updatecert', $_POST)){
-	if(is_numeric($_POST['sincert']) && strlen($_POST['sincert']) < 9){
 	executePlainSQL("UPDATE Chef SET certificates = '".$_POST['cert']."' WHERE sin = '".$_POST['sincert']."';");
 	echo "Ceertificates changed.";
 	OCICommit($db_conn);
-	}else {echo "Invalid Input";}
 	}
 
 
