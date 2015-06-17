@@ -2,7 +2,6 @@
 <html> 
 <body>
 <p><font size='6'> MANAGER </font></p>
-<p> testing <?php echo $_SESSION['use'] ?> </p> 
 <br><br>
 
 <p><b>Find Staff:</b></p>
@@ -47,10 +46,13 @@
 	</p>
 </form>
 
+<form action='' method='post'>
 <p><b>Delete Staff:</b></p>
-<p> <font size='2'> SIN: </font><input type='text' name='ds_SIN'>
+<p> <font size='2'> SIN: </font><input type='text' name='ds_SIN'><br>
+	<font size='2'> Date: </font><input type='text' name='ds_date' value='yyyymmdd'><br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<input type='submit' name='sub_ds' value='Delete'>
-</p>
+</p></form>
 
 <br><br>
 
@@ -83,15 +85,18 @@
 	</p>
 </form>
 
+<form action='manhome.php' method='post'>
 <font size='3'>Set the salary of the staff whose pay is higher than the average to be the average.</font>
-<input type='submit' name='sub_es_avsal' value='Set'>
+<input type='submit' name='sub_es_avsal' value='Set'></form>
 <br><br>
+<!--
 <form action='manhome.php' method='post'>
 <font size='3'>Transfer all the staff members that have worked at <input type='text' name='es_transfer' value='Branch Postal Code'> but no longer work there to that branch in their current positions.</font>
 <input type='submit' name='sub_es_transfer' value='Transfer'>
-</form><br>
+</form><br> -->
+<form action='manhome.php' method='post'>
 <font size='3'>Find the waiter with the highest pay and make him supervise all the other waiters</font>
-<input type='submit' name='sub_es_supall' value='Set'>
+<input type='submit' name='sub_es_supall' value='Set'></form>
 <br><br><br>
 
 <p><b>Update Branch Info:</b></p>
@@ -104,6 +109,11 @@
 <br><br>
 
 <p><b>Others:</b></p>
+
+<form action='manhome.php' mehtod='post'>
+<font size='3'>Find branches managed by <input type='text' name='o_man' value='Manager Name'></font>
+<input type='submit' name='sub_o_man' value='Search'></form><br>
+
 <form action='manhome.php' method='post'>
 <font size='3'>Compare performances of managers managing branches of</font>
 <input type='text' name='o_compare' value='Restaurant Name'>
@@ -111,14 +121,14 @@
 
 <form action='manhome.php' method='post'>
 <font size='3'>Find the most popular dishes:</font><br>
-<input type='text' name='o_pop_res' value='Restaurant Name'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<input type='text' name='o_pop_reg' value='City or Province'>
+<input type='text' name='o_pop_res' value='Restaurant Name'>
 <input type='submit' name='sub_o_pop' value='Search'></form><br>
 
 <form action='manhome.php' method='post'>
 <font size='3'>Count the number of customers that have visited
 	<input type='text' name='o_cust_br' value='Branch Postal Code'>
-	on <input type='text' name='o_cust_date' value='Date in yyyymmdd'></font>
+	from <input type='text' name='o_cust_from' value='Date in yyyymmdd'>
+	to <input type='text' name='o_cust_to' value='Date in yyyymmdd'></font>
 <input type='submit' name='sub_o_cust' value='Submit'></form><br>
 
 
@@ -127,8 +137,7 @@
 
 <?php
 $db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
-$login = $_POST["user"];
-
+$login = $_COOKIE["username"];
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
 	global $db_conn, $success;
@@ -192,106 +201,226 @@ function executeBoundSQL($cmdstr, $list) {
 
 }
 
-$login = $_POST['user'];
+
 if ($db_conn){
-	// View staff list (sin, name, branch)
+	$result = null;
 	if (array_key_exists('sub_fs_list', $_POST)){
+		// View staff list (sin, name, branch)
 		$result = executePlainSQL('select sin, name, pc from staff s, worksat w where s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!) order by sin;');
 	} else if (array_key_exists('sub_fs_SIN', $_POST)){
-/* Find staff by sin
-	 * - args(sin)
-	 * - return staff with that sin (sin, name, branch)
-	 * - 1 query
-	 */
+   		//Find staff by sin
 		$sin = $_POST['fs_SIN'];
-		$result = executePlainSQL('select sin, name, pc from Staff s, WorksAt w where s.ssin=$sin! and s.sin=w.sin and w.pc in (select pc from WorksAt where sin=$login!) order by sin;');
+		$result = executePlainSQL("select sin, name, pc from Staff s, WorksAt w where s.ssin=$sin and s.sin=w.sin and w.pc in (select pc from WorksAt where sin=$login) order by sin;");
 	} else if (array_key_exists('sub_fs_name', $_POST)) {
-
-/* Find staff by Name
-	 * - args(name)
-	 * - return list of staff with that name (sin, name, branch)
-	 * - 1 query
-	 */
+		//Find staff by Name
 		$name = $_POST['fs_name'];
-		$result = executePlainSQL('select sin, name, pc from staff s, worksat w where name=&name! and s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!) order by sin;');
+		$result = executePlainSQL("select sin, name, pc from staff s, worksat w where name=$name and s.sin=w.sin and w.pc in (select pc from worksat where sin=$login) order by sin;");
 	
 	} else if (array_key_exists('sub_fs_branch', $_POST)) {
-/* Find staff by branch
-	 * - args(branch pc)
-	 * - return list of staff working at the branch (sin, name, branch)
-	 * - 1 query
-	 */		
-		$pc = $_POST['fs_branch'];
-		$result = executePlainSQL('select sin, name, pc from Staff s, WorksAt w where s.sin=w.sin and w.pc=$pc! and w.pc in (select pc from WorksAt where sin=$login!) order by sin;');
+		//Find staff by branch
+	 	$pc = $_POST['fs_branch'];
+		$result = executePlainSQL("select sin, name, pc from Staff s, WorksAt w where s.sin=w.sin and w.pc=$pc and w.pc in (select pc from WorksAt where sin=$login) order by sin;");
 	} else if (array_key_exists('sub_as', $_POST)) {
-/* Add staff
-	 * - args(name, sin, pw, pc, pos, sal, avail, sch, sdate)
-	 * - add new tuple to Staff and WorksAt
-	 * - 2 queries
-	 */		
+		// Add staff
+		$name = $_POST['as_name'];
+		$pc = $_POST['as_branchPC'];
+		$avail = $_POST['as_avail'];
+		$sin = $_POST['as_SIN'];
+		$pos = $_POST['as_pos'];
+		$sch = $_POST['as_schedule'];
+		$pw = $_POST['as_pw'];
+		$sal = $_POST['as_sal'];
+		$date = $_POST['as_date'];
+
+		$staff = executePlainSQL("insert into Staff values($sin, $name, $pw, $avail);");
+		$worksat = executePlainSQL("insert into WorksAt values($sin, $pc, $date, $pos, $sal);");
+
+		if (preg_match("(.*waiter.*)|(.*Waiter.*)", $pos))
+			executePlainSQL("insert int Waiter values($sin, $sch);");
+		else if (preg_match("(.*manager.*)|(.*Manager.*)", $pos)) {
+			executePlainSQL("insert into Manager values($sin);");
+			executePlainSQL("update branch set sin=$sin where pc=$pc;");
+		}
+		else if (preg_match("(.*chef.*)|(.*Chef.*)", $pos)
+			executePlainSQL("insert into Chef values($sin, $sch, null);");
+		$result = "Add successful!";
+		OCICommit($db_conn);
 	} else if (array_key_exists('sub_ds', $_POST)) {
-/* Delete Staff
-	 * - args(sin)
-	 * - add one tuple to HWA using info from WA
-	 * - delete a tuple from chef/manager/waiter if used to be one of them 
-	 * - delete a tuple from WA
-	 * - 2-3 queries
-	 */		
+		//Delete Staff
+		$sin = $_POST["ds_SIN"];
+		$date = $_POST["ds_date"];
+	    //add one tuple to HWA using info from WA
+		executePlainSQL("insert into HasWorkedAt select sin, pc, since, $date, pos, salary from WorksAt where sin=$sin;");
+		//delete a tuple from chef/manager/waiter if used to be one of them 
+		executePlainSQL("delete from Chef where sin=$sin;");
+		executePlainSQL("delete from Waiter where sin=$sin;");
+		executePlainSQL("delete from Manager where sin=$sin;");
+		// delete a tuple from WA
+		executePlainSQL("delete from WorksAt where si=$sin;");
+	
+		// note: at least a branch is left without a manager 
+		$result = "Delete Successful!";
+		OCICommit($db_conn);
 	} else if (array_key_exists('sub_es', $_POST)) {
-/* Edit Staff
-	 * - args() --> a lot
-	 * - store sin
-	 * - check each op one by one --> perform op if input not null   !!! no input == null????
-	 *   - supervisor sin, add/remove
-	 *   - supervisee, add/remove
-	 *   - new pos
-	 *   - new schedule
-	 *   - set sal
-	 *   - transfer
-	 *   - supervise all
-	 * - 9 queries, 11 if's (ish)
-	 */		
+			//Edit Staff
+	
+		$sin = $_POST["es_sin"];
+		$spvisor = $_POST["es_supervisor"];
+		$spvisee = $_POST["es_supervisee"];
+		$selected_sor = $_POST["sub_es_supervisor"];
+		$selected_see = $_POST["sub_es_supervisee"];
+		$pos = $_POST["es_pos"];
+		$pc = $_POST["es_pc"];
+		$sal = $_POST["es_sal"];
+		$date = $_POST["es_sdate"];
+		$sch = $_POST["es_schedule"];
+
+		if ($spvisor != 'SIN') {
+			if ($selected_sor == "Add")
+				executePlainSQL("insert into Supervises values($spvisor, $sin);");
+			else if ($selected_sor == "Remove")
+				executePlainSQL("delete from Supervises where sr_sin = $spvisor and jr_sin=$sin;");
+			else
+				echo "Please select add or remove.";
+			$result = "Supervisor added! ";
+		}
+		if ($spvisee != 'SIN') {
+			if ($selected_see == "Add")
+				executePlainSQL("insert into Supervises values($sin, $spvisee);");
+			else if ($selected_see == "Remove")
+				executePlainSQL("delete from Supervises where jr_sin = $spvisee and sr_sin=$sin;");
+			else
+				echo "Please select add or remove.";
+			$result .= "Supervisee added! ";
+		}
+		if($pos !='New Position') {
+			$oldPos = executePlainSQL("select pos from WorksAt where sin=$sin;");
+			// save wa to hwa
+			executePlainSQL("insert into HasWorkedAt select $sin as sin, pc, sfrom, $date as to, pos, salary from WorksAt where sin=$sin;");
+			
+			// if chef, man, or waiter add
+			if(preg_match("(.*waiter.*)|(.*Waiter.*)", $pos) && preg_match("(.*chef.*)|(.*Chef.*)", $oldPos)) {
+				executePlainSQL("insert into Waiter select $sin as sin, schedule from Chef where sin=$sin;");
+				executePlainSQL("delete from Chef where sin=$sin;");
+			} else if (preg_match("(.*waiter.*)|(.*Waiter.*)", $pos) && preg_match("(.*manager.*)|(.*Manager.*)", $oldPos)){
+				// insert new waiter tuple
+				executePlainSQL("insert into Waiter values($sin, null);");
+				// delete manager tuple
+				executePlainSQL("delete from Manager where sin=$sin;");
+
+				// note: a branch is now without a manager --> add a manager; waiter has no shifts
+			} else if (preg_match("(.*chef.*)|(.*Chef.*)", $pos) && preg_match("(.*waiter.*)|(.*Waiter.*)", $oldPos)) {
+				// insert new chef
+				executePlainSQL("insert into Chef select $sin as sin, shifts as schedule, null as certificates from Waiter, where sin=$sin;");
+				// delete waiter
+				executePlainSQL("delete from Waiter where sin=$sin;");
+				// note: chef has no certificates
+			} else if (preg_match("(.*chef.*)|(.*Chef.*)", $pos) && preg_match("(.*manager.*)|(.*Manager.*)", $oldPos)){
+				// insert new chef tuple
+				executePlainSQL("insert into Chef values($sin, null, null);");
+				// delete manager tuple
+				executePlainSQL("delete from Manager where sin=$sin;");
+
+				// note: a branch is now without a manager --> add a manager; chef has empty schedule and certificates
+			} else if (preg_match("(.*manager.*)|(.*Manager.*)", $pos) && preg_match("(.*waiter.*)|(.*Waiter.*)", $oldPos)){
+				// update man in branch table where pc = pc
+				executePlainSQL("update Branch set sin=$sin where pc=$pc;");
+				// insert new tuple to manager
+				executePlainSQL("insert into manager values($sin);");
+				// delete tuple from waiter
+				executePlainSQL("delete from waiter where sin=$sin");
+
+			} else if (preg_match("(.*Manager.*)|(.*manager.*)", $pos) && preg_match("(.*chef.*)|(.*Chef.*)", $oldPos)) {
+				// update man in branch table where pc=pc
+				executePlainSQL("update Branch set sin=$sin where pc=$pc;");
+				// insert new table to manager
+				executePlainSQL("insert into manager values($sin);");
+				// delete tuple from chef
+				executePlainSQL("delete from Chef where sin=$sin");
+
+			} else if (preg_match("(.*Manager.*)|(.*manager.*)", $pos) {
+				executePlainSQL("insert into Manager values($sin);");
+				executePlainSQL("update Branch set sin=$sin where pc=$pc;");
+
+			} else if (preg_match("(.*Chef.*)|(.*chef.*)", $pos) {
+				executePlainSQL("insert into Chef values($sin, null, null);");
+				//note: chef has no shifts or certificates
+			} else if (preg_match("(.*Waiter.*)|(.*waiter.*)", $pos){
+				executePlainSQL("insert into Waiter values($sin, null);");
+				// note: waiter has no shfits
+			}
+			// update pos in wa
+			executePlainSQL("update WorksAt set pos=$pos where sin=$sin;");
+			executePlainSQL("update WorksAt set salary=$sal where sin=$sin;");
+			executePlainSQL("update WorksAt set pc=$pc where sin=$sin;");
+			executePlainSQL("update WorksAt set since=$date where sin=$sin;");
+			$result .= "New position added! ";
+
+		}
+		if($sch!=NULL) {// !!!!!!!!check this!!!!
+			executePlainSQL("update Waiter set shifts=$sch where sin=$sin;");
+			executePlainSQL("update Chef set schedule=$sch where sin=$sin;");
+			$result .= "Schedule updated! ";
+		}
+
+		OCICommit($db_conn);
 	} else if (array_key_exists('sub_es_avsal', $_POST)) {
-/* set sal
- * - no args
- * - 1 query
- */
+		// set all to <= av salary 
+		$result = executePlainSQL("select count(*) from WorksAt where salary > (select AVG(salary) from Staff natural inner join WorksAt);");
+ 		executePlainSQL("update Staff set salary = (select AVG(salary) FROM Staff natural inner join WorksAt)
+ 						 where salary > (select AVG(salary) from Staff natural inner join WorksAt);");
+		$result .= " updated. "
+		OCICommit($db_conn);
+	} /* else if (array_key_exists('sub_es_transfer', $_POST)) {
+ 		* transfer
+ 		* - args(branch)
+ 		* - 1 query
+ 		*		//!!!!!!
+	} */ else if (array_key_exists('sub_es_supall', $_POST)) {
+		// supervise all
+		executePlainSQL("create VIEW WaitorWithMostPay AS SELECT w.sin FROM Waiter w, WorksAt wa1 WHERE w.sin = wa1.sin AND NOT EXIST 
+			(SELECT * FROM WorksAt wa2 WHERE wa1.salary < wa2.salary);");
+		executePlainSQL("create VIEW Candidate AS SELECT sin FROM WaitorWithMostPay w1 ORDER BY since;");
+		executePlainSQL("insert INTO Supervises SELECT Candidate, sin FROM Waiter;");
 		
-	} else if (array_key_exists('sub_es_transfer', $_POST)) {
-/* transfer
- * - args(branch)
- * - 1 query
- */		
-	} else if (array_key_exists('sub_es_supall', $_POST)) {
-/* supervise all
- * - no args
- * - 1 query
- */		
+		$result = "Supervising all. "
+		OCICommit($db_conn);
+
 	} else if (array_key_exists('sub_ub', $_POST)) {
-/* Update Branch
-	 * - args(pc, budget, performance)
-	 * - update a tuple in Branch
-	 * - 1 query
-	 */		
+		// Update Branch	
+		$pc = $_POST["ub_branch"];
+		$budge = $_POST["ub_budget"];
+		$performance = $_POST["ub_pfmce"];
+		executePlainSQL("update branch set budge=$budget, performance=$performance;");
+
+		$result = "Branch updated. "
+		OCICommit($db_conn);
+
+	} else if (array_key_exists('sub_o_man', $_POST)){
+		// Find branches managed by a manager
+		$sin = $_POST['o_man'];
+		$result = executePlainSQL("select pc from Branch where sin=$sin;");
+
 	} else if (array_key_exists('sub_o_compare', $_POST)) {
-/* Compare performances
-	 * - args(restaurant)
-	 * - return a list of performances, managers, branches ordered by performance
-	 * - 1 query
-	 */		
+		// Compare performances/		
+		$res = $_POST["o_compare"];
+		$result = executePlainSQL("select performance, pc from Branch where where rname=$res order by performance desc;");
 	} else if (array_key_exists('sub_o_pop', $_POST)) {
-/* Find the most popular dishes
-	 * - args(restaurant, region)
-	 * - assume region is province --> if null assume region is city 
-	 * - 2 queries; 1 if
-	 */		
+		// Find the most popular dishes
+
+		$res = $_POST["o_pop_res"];
+		$result = executePlainSQL("select dish_name from SellsDish sd1 where rname = restaurant 
+						and not exist (select * from SellsDish sd2 where sd1.popularity < sd2.popularity);");
 	} else if (array_key_exists('sub_o_cust', $_POST)) {
-/* Count #cust
-	 * - args(pc, date)
-	 * - return a num, branch, date
-	 * - 1 query */		
+		// Count #cust
+		$pc = $_POST["o_cust_br"];
+		$from = $_POST["o_cust_from"];
+		$to = $_POST["o_cust_to"];
+
+		$result = executePlainSQL("select SUM(num) FROM Visits WHERE v_date>=$from OR v_date<=$to AND pc=$pc;");
 	}
 	
+	printResult($result);
 
 OCILogoff($db_conn);
 }
