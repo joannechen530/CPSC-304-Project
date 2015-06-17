@@ -1,4 +1,4 @@
-﻿/* Initialize tables and instances */
+/* Initialize tables and instances */
 
 
 drop table Visits;
@@ -22,6 +22,7 @@ drop table Staff;
 CREATE TABLE Customer
 	(username CHAR(20) not null,
 	phone CHAR(50), 
+	pw CHAR(50) not null, 
 	PRIMARY KEY (username));
  
 grant select on Customer to public;
@@ -173,19 +174,19 @@ grant select on Review to public;
 
 
 insert into Customer
-values('TheEater56', '416 555-0100');
+values('TheEater56', '416 555-0100', 'c123');
 
 insert into Customer
-values('FoodieFoo', '604 666-0200');
+values('FoodieFoo', '604 666-0200', 'c456');
 
 insert into Customer
-values('CheeseBurgo', '741 888-0300');
+values('CheeseBurgo', '741 888-0300', 'c999');
 
 insert into Customer
-values('ieatyou36', '250 000-0400');
+values('ieatyou36', '250 000-0400', 'c111');
 
 insert into Customer
-values('user3333', '778 333-0500');
+values('user3333', '778 333-0500', 'c000');
 
 
  
