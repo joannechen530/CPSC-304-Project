@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html> 
 <body>
-<p>Wait Staff</p>
+<p>General Staff</p>
 
 <br>
 <?php 
