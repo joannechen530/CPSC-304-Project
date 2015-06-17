@@ -3,6 +3,12 @@
 <body>
 <p>Customer</p>
 
+<br>
+<?php 
+$login = $_COOKIE["username"];
+echo $login; 
+?>
+
 <p>Write a review: </p>
 <p> Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostalCode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rating&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date</p>
 <form method="POST" action="custhome.php">
