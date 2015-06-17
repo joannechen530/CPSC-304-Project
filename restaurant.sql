@@ -50,8 +50,8 @@ grant select on Waiter to public;
  
 CREATE TABLE Chef
 	(staff_ssin INT not null references staff(ssin),
-	schedule CHAR(200) null,
 	certificates CHAR(200) null,
+	schedule CHAR(200) null,
 	PRIMARY KEY(staff_ssin));
  
 grant select on Chef to public;
