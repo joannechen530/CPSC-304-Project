@@ -3,6 +3,12 @@
 <body>
 <p>Wait Staff</p>
 
+<br>
+<?php 
+$login = $_COOKIE["username"];
+echo $login; 
+?>
+
 <p>Find my info: </p>
 <p><font size="2"> SIN</font></p>
 <form method="POST" action="waithome.php">
