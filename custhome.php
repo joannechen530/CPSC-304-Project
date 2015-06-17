@@ -103,14 +103,16 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('submitreview', $_POST)){
-
-		executePlainSQL("insert into review values ('".$_POST['namereviews']."', '".$_POST['pcreview']."', '".$_POST['ratingreview']."', '".$_POST['datereview']."' , '".$_POST['commentreview']."')");
+		if ( strlen($_POST['pcreview']) < 8 && is_numeric($_POST['datereview']) && $_POST['datereview'] < 20160101 && strlen($_POST['commentreview']) < 300){
+		executePlainSQL("INSERT into review values ('".$_POST['namereviews']."', '".$_POST['pcreview']."', '".$_POST['ratingreview']."', '".$_POST['datereview']."' , '".$_POST['commentreview']."')");
 		executePlainSQL("UPDATE Branch SET av_rating = (SELECT AVG(rating) FROM Reviews WHERE pc = v_rpc GROUP BY pc)");
+	}else {
+		echo "Invalid Inputs";}
 
 		OCICommit($db_conn);
 	} else
 	if (array_key_exists('searchforreviews', $_POST)){
-	$result = executePlainSQL("select r.username, r.rating, R.P_DATE, r.comment from review r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."')");
+	$result = executePlainSQL("SELECT r.username, r.rating, R.P_DATE, r.comment from review r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."')");
 	echo "<table>";
 	echo "<tr><th>Name</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
 
@@ -123,7 +125,7 @@ if ($db_conn){
 	}else 
 
 	if(array_key_exists ("searchforallreviews", $_POST)){
-	$result = executePlainSQL("select * from reviews where pc = (select pc from branch where name = '".$_POST['namereview']."' ");
+	$result = executePlainSQL("SELECT * from reviews where pc = (select pc from branch where name = '".$_POST['namereview']."' ");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>Postal Code</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
 
