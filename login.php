@@ -54,6 +54,34 @@ Password: <input type="text" name="cpass"><br>
 <input type="submit" value="Search" name="searchfordishes"></p>
 </form>
 
+<p>Find the most highly rated restaurants with this dish: </p>
+<p><font size="2"> Dish </font></p>
+<form method="POST" action="login.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="dishname" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="searchforrnamedishes"></p>
+</form>
+
+<p>Find the most highly rated branch of this restaurant: </p>
+<p><font size="2"> Restaurant</font></p>
+<form method="POST" action="login.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="reshigh" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="highrated"></p>
+</form>
+
+<p>Find the most popular dish from a restaurant: </p>
+<p><font size="2"> Restaurant</font></p>
+<form method="POST" action="login.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="dishres" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="popdish"></p>
+</form>
+
+
 
 
 
@@ -230,6 +258,46 @@ if ($db_conn){
 
 			while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 				echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["COMMENT"] . "</td></tr>";  
+			}
+			echo "</table>";
+
+		OCICommit($db_conn);
+	} else 
+	if (array_key_exists('searchforrnamedishes', $_POST)){
+		executePlainSQL("CREATE VIEW PlacesWithDish AS SELECT DISTINCT rname FROM Restaurant natural inner join SellsDish WHERE dname like '%'".$_POST['dishname']."'&'");
+		$result = executePlainSQL("SELECT rname, pc FROM Branch  WHERE rname in PlacesWithDish AND  av_rating = (SELECT MAX(av_rating) FROM Branch GROUP BY rname HAVING rname IN PlacesWithDish)");
+			echo "<table>";
+			echo "<tr><th>Restaurant Name</th><th>Postal Code</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["RNAME"] . "</td><td>" . $row["PC"] . "</td></tr>";  
+			}
+			echo "</table>";
+
+		OCICommit($db_conn);
+	}else 
+	if (array_key_exists('highrated', $_POST)){
+		$result = executePlainSQL("SELECT pc FROM Branch b1 WHERE rname = '".$_POST['reshigh']."' AND NOT EXIST (SELECT * FROM Branch b2 WHERE b1.rating < b2.rating)");
+			echo "<table>";
+			echo "<tr><th>Postal Code</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["PC"] . "</td></tr>";  
+			}
+			echo "</table>";
+
+		OCICommit($db_conn);
+	} else
+	if (array_key_exists('popdish', $_POST)){
+		$result = executePlainSQL("SELECT dname FROM SellsDish sd1 WHERE rname = '".$_POST['dishres']."' AND NOT EXIST (SELECT * FROM SellsDish sd2 WHERE sd1.popularity < sd2.popularity)");
+			echo "<table>";
+			echo "<tr><th>Dish</th></tr>";
+			while ($row = OCI_Fetch_Assoc($result)) {
+				//echo "here";
+				//print_r($row);
+				echo "<tr><td>" . $row["DNAME"] . "</td></tr>";  
 			}
 			echo "</table>";
 
