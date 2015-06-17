@@ -10,7 +10,7 @@ echo $login;
 ?>
 
 <p>Write a review: </p>
-<p> Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostalCode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rating&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date</p>
+<p> Username&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostalCode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rating&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date</p>
 <form method="POST" action="custhome.php">
 <!--refresh page when submit-->
    <p><input type="text" name="namereviews" size="6"><input type="text" name="pcreview" size="6"><input type="text" name="ratingreview" size="6"><input type="text" name="datereview" size="6"><br><br>Comment<br><input type="text" name="commentreview" size="6" style="width:200px; height:200px;">
@@ -39,7 +39,7 @@ echo $login;
 
 
 <?php
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
+$db_conn = OCILogon("ora_y2q8", "a33104126", "ug");
 
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
@@ -111,14 +111,14 @@ if ($db_conn){
 	if (array_key_exists('submitreview', $_POST)){
 		if ( strlen($_POST['pcreview']) < 8 && is_numeric($_POST['datereview']) && $_POST['datereview'] < 20160101 && strlen($_POST['commentreview']) < 300){
 		executePlainSQL("INSERT into review values ('".$_POST['namereviews']."', '".$_POST['pcreview']."', '".$_POST['ratingreview']."', '".$_POST['datereview']."' , '".$_POST['commentreview']."')");
-		executePlainSQL("UPDATE Branch SET av_rating = (SELECT AVG(rating) FROM Reviews WHERE pc = v_rpc GROUP BY pc)");
+		executePlainSQL("UPDATE Branch SET av_rating = (SELECT AVG(rating) FROM Reviews WHERE pc = '".$_POST['namereviews']."' GROUP BY pc)");
 	}else {
 		echo "Invalid Inputs";}
 
 		OCICommit($db_conn);
 	} else
 	if (array_key_exists('searchforreviews', $_POST)){
-	$result = executePlainSQL("SELECT r.username, r.rating, R.P_DATE, r.comment from review r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."')");
+	$result = executePlainSQL("SELECT r.username, r.rating, R.P_DATE, r.rcomment from review r where r.pc = (select b1.pc from branch b1, branch_city b2 where b1.pc = b2.pc and b1.addr = '".$_POST['addressreview']."' and b2.city = '".$_POST['cityreview']."')");
 	echo "<table>";
 	echo "<tr><th>Name</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
 
@@ -131,7 +131,7 @@ if ($db_conn){
 	}else 
 
 	if(array_key_exists ("searchforallreviews", $_POST)){
-	$result = executePlainSQL("SELECT * from reviews where pc = (select pc from branch where name = '".$_POST['namereview']."' ");
+	$result = executePlainSQL("SELECT * from review where pc = (select pc from branch where bname = '".$_POST['namereview']."') ");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>Postal Code</th><th><Rating</th><th><Posting Date</th><th>Comment</th></tr>";
 
