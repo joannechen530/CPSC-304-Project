@@ -65,10 +65,10 @@ CREATE TABLE Supervises
 grant select on Supervises to public;
 
 CREATE TABLE Restaurant
-	(name CHAR(50) not null,
+	(rname CHAR(50) not null,
 	type CHAR(50) null,
 	s_date DATE null,
-	PRIMARY KEY(name));
+	PRIMARY KEY(rname));
 
 grant select on Restaurant to public;
 
@@ -93,12 +93,12 @@ CREATE TABLE Branch
 	av_rating INT,
 	phone CHAR(10),
 	capacity INT,
-	name CHAR(20) NOT NULL,
+	rname CHAR(20) NOT NULL,
 	sin INT NOT NULL, 
 	performance INT, 
 	budget INT,
 	PRIMARY KEY(pc),
-	FOREIGN KEY(name) REFERENCES Restaurant(name)
+	FOREIGN KEY(name) REFERENCES Restaurant(rname)
   		ON DELETE CASCADE
   		ON UPDATE CASCADE
 	FOREIGN KEY(sin) REFERENCES Manager(sin)
@@ -108,12 +108,12 @@ CREATE TABLE Branch
 grant select on Branch to public;
 
 CREATE TABLE SellsDish
-	(restaurant_name CHAR(200) not null,
-	dish_name CHAR(200) not null,
+	(rname CHAR(200) not null,
+	dname CHAR(200) not null,
 	price INT null,
 	popularity INT null,
-	PRIMARY KEY(restaurant_name, dish_name),
-	FOREIGN KEY(restaurant_name) REFERENCES Restaurant ON DELETE CASCADE, ON UPDATE CASCADE);
+	PRIMARY KEY(rname, dish_name),
+	FOREIGN KEY(rname) REFERENCES Restaurant ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on SellsDish to public;
 
