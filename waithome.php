@@ -120,6 +120,7 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){
+	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) < 9){
 	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
@@ -130,15 +131,21 @@ if ($db_conn){
 	echo "</table>";
 
 		OCICommit($db_conn);
+	}else {echo "Invalid Inputs";}
+
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
+	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) < 9){
 	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
 	echo "Availability changed.";
 	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+
 	} else
 
 	if (array_key_exists('supervisor', $_POST)){
+	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) < 9){
 	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
 	//print
 	echo "<table>";
@@ -149,13 +156,13 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
+	} else{echo "Invalid Inputs";}
 
 	} else
 
 	if (array_key_exists('supervisoremployees', $_POST)){
-
-	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");
-	//print		
+	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) < 9){
+	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
 	echo "<table>";
 	echo "<tr><th>Name</th></tr>";
 
@@ -164,11 +171,14 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+	
 	} else 
 
 	if (array_key_exists('findshifts', $_POST)){
-	$result = executePlainSQL("select shifts from waiter where sin = '".$_POST['sinshifts']."'");
-	//print		
+	if(is_numeric($_POST['sinshifts']) && strlen($_POST['sinshifts']) < 9){
+	$result = executePlainSQL("SELECT shifts from waiter where sin = '".$_POST['sinshifts']."'");
+
 	echo "<table>";
 	echo "<tr><th>Shifts</th></tr>";
 
@@ -177,6 +187,7 @@ if ($db_conn){
 	}
 	echo "</table>";
 	OCICommit($db_conn);
+	}else {echo "Invalid Inputs";}
 	}
 
 
