@@ -2,7 +2,53 @@
 <html> 
 <body>
 <p><font size='6'> MANAGER </font></p>
+
+<br>
+<?php 
+$login = $_COOKIE["username"];
+echo $login; 
+?>
+
 <br><br>
+<!--////////////////////////////-->
+<p>Find my info: </p>
+<p><font size="2"> SIN</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sininfo" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="findmyinfo"></p>
+</form>
+
+<p>Update Availability:</p>
+<p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinavail" size="6"><input type="text" name="avail" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Update" name="updateavail"></p>
+</form>
+
+<p>Find Supervisor:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinsuper" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="supervisor"></p>
+</form>
+
+<p>Find employees with a certain supervisor:</p>
+<p><font size="2">SIN</font></p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="sinsuperem" size="6">
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="supervisoremployees"></p>
+</form>
+<br><br>
+
+<!--////////////////////////////-->
 
 <p><b>Find Staff:</b></p>
 <p> <input type='submit' name='fs_list' value='View staff list'></p>
@@ -109,7 +155,6 @@
 <br><br>
 
 <p><b>Others:</b></p>
-
 <form action='manhome.php' mehtod='post'>
 <font size='3'>Find branches managed by <input type='text' name='o_man' value='Manager Name'></font>
 <input type='submit' name='sub_o_man' value='Search'></form><br>
@@ -137,7 +182,7 @@
 
 <?php
 $db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
-$login = $_COOKIE["username"];
+
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
 	global $db_conn, $success;
@@ -216,6 +261,56 @@ function printResult($result) { //prints results from a select statement
 
 if ($db_conn){
 	$result = null;
+
+	/***************************************/
+	if (array_key_exists('findmyinfo', $_POST)){
+	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) < 9){
+	$result = executePlainSQL("SELECT name, sin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE sin = '".$_POST['sininfo']."'");
+	echo "<table>";
+	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+	}
+	echo "</table>";
+		OCICommit($db_conn);
+	}else {echo "Invalid Inputs";}
+	} else
+	if (array_key_exists('updateavail', $_POST)){
+	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) < 9){
+	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE sin = '".$_POST['sinavail']."';");
+	echo "Availability changed.";
+	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+	} else
+	if (array_key_exists('supervisor', $_POST)){
+	if(is_numeric($_POST['sinsuper']) && strlen($_POST['sinsuper']) < 9){
+	$result = executePlainSQL("select name from staff where sin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')");
+	//print
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else{echo "Invalid Inputs";}
+	} else
+	if (array_key_exists('supervisoremployees', $_POST)){
+	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) < 9){
+	$result = executePlainSQL("select name from staff where sin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+	echo "<table>";
+	echo "<tr><th>Name</th></tr>";
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	} else {echo "Invalid Inputs";}
+	
+	} 
+
+	/***************************************/
+
 	if (array_key_exists('sub_fs_list', $_POST)){
 		// View staff list (sin, name, branch)
 		$result = executePlainSQL('select sin, name, pc from staff s, worksat w where s.sin=w.sin and w.pc in (select pc from worksat where sin=$login!) order by sin;');
@@ -252,8 +347,7 @@ if ($db_conn){
 		else if (preg_match("(.*manager.*)|(.*Manager.*)", $pos)) {
 			executePlainSQL("insert into Manager values($sin);");
 			executePlainSQL("update branch set sin=$sin where pc=$pc;");
-		}
-		else if (preg_match("(.*chef.*)|(.*Chef.*)", $pos)
+		} else if (preg_match("(.*chef.*)|(.*Chef.*)", $pos))
 			executePlainSQL("insert into Chef values($sin, $sch, null);");
 		$result = "Add successful!";
 		OCICommit($db_conn);
@@ -350,14 +444,14 @@ if ($db_conn){
 				// delete tuple from chef
 				executePlainSQL("delete from Chef where sin=$sin");
 
-			} else if (preg_match("(.*Manager.*)|(.*manager.*)", $pos) {
+			} else if (preg_match("(.*Manager.*)|(.*manager.*)", $pos)) {
 				executePlainSQL("insert into Manager values($sin);");
 				executePlainSQL("update Branch set sin=$sin where pc=$pc;");
 
-			} else if (preg_match("(.*Chef.*)|(.*chef.*)", $pos) {
+			} else if (preg_match("(.*Chef.*)|(.*chef.*)", $pos)) {
 				executePlainSQL("insert into Chef values($sin, null, null);");
 				//note: chef has no shifts or certificates
-			} else if (preg_match("(.*Waiter.*)|(.*waiter.*)", $pos){
+			} else if (preg_match("(.*Waiter.*)|(.*waiter.*)", $pos)){
 				executePlainSQL("insert into Waiter values($sin, null);");
 				// note: waiter has no shfits
 			}
@@ -381,7 +475,7 @@ if ($db_conn){
 		$result = executePlainSQL("select count(*) from WorksAt where salary > (select AVG(salary) from Staff natural inner join WorksAt);");
  		executePlainSQL("update Staff set salary = (select AVG(salary) FROM Staff natural inner join WorksAt)
  						 where salary > (select AVG(salary) from Staff natural inner join WorksAt);");
-		$result .= " updated. "
+		$result .= " updated. ";
 		OCICommit($db_conn);
 	} /* else if (array_key_exists('sub_es_transfer', $_POST)) {
  		* transfer
@@ -395,7 +489,7 @@ if ($db_conn){
 		executePlainSQL("create VIEW Candidate AS SELECT sin FROM WaitorWithMostPay w1 ORDER BY since;");
 		executePlainSQL("insert INTO Supervises SELECT Candidate, sin FROM Waiter;");
 		
-		$result = "Supervising all. "
+		$result = "Supervising all. ";
 		OCICommit($db_conn);
 
 	} else if (array_key_exists('sub_ub', $_POST)) {
@@ -405,7 +499,7 @@ if ($db_conn){
 		$performance = $_POST["ub_pfmce"];
 		executePlainSQL("update branch set budge=$budget, performance=$performance;");
 
-		$result = "Branch updated. "
+		$result = "Branch updated. ";
 		OCICommit($db_conn);
 
 	} else if (array_key_exists('sub_o_man', $_POST)){
