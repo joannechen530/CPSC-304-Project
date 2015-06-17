@@ -5,9 +5,10 @@
 
 
 
-<?php
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
-
+<?php 
+$login = $_COOKIE["username"];
+echo $login; 
+?>
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
