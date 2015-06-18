@@ -102,6 +102,13 @@ echo $login;
 	<input type='submit' name='sub_ds' value='Delete'>
 </p></form>
 
+<form action='' method='post'>
+<p><b>Delete Staff:</b></p>
+<p> <font size='2'> SIN: </font><input type='text' name=SINDelete><br>
+	<input type='submit' name='deletestaff' value='Delete'>
+</p></form>
+
+
 <br><br>
 
 <p><b>Edit Staff Info:</b></p>
@@ -404,7 +411,15 @@ if ($db_conn){
 			echo "Delete Successful! <br>";
 			OCICommit($db_conn);
 		} else echo "Invalid Input. <br>";
-
+	}else if (array_key_exists('deletestaff', $_POST)){
+		if(is_numeric('".$_POST['SINdelete']."') && strlen('".$_POST['SINdelete']."')==9){
+			executePlainSQL("delete from Staff where ssin = '".$_POST['SINdelete']."' ");
+			echo "Delete Succesful! <br>";
+		}else {
+			echo "Invalid Input";
+			
+		}	
+	
 	} else if (array_key_exists('sub_es', $_POST)) {
 			//Edit Staff
 
