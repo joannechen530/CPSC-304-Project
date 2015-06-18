@@ -5,7 +5,7 @@
 
 <?php 
 $db_conn = OCILogon("ora_l2r8", "a32433120", "ug");
-$login = 334455668;//$_COOKIE["username"];!!!
+$login = $_COOKIE["username"];
 echo "<p><font size='4'> My Info: </font></p>";
 $result = executePlainSQL("select name, s.ssin, pos, salary, pc, since from Staff s, WorksAt w where s.ssin=w.ssin and s.ssin=$login");
 $row = OCI_Fetch_Array($result, OCI_BOTH);
@@ -23,6 +23,14 @@ while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To: $row[4]</font><br><br>";
 }
 ?>
+
+<p>Find my info: </p>
+<form method="POST" action="chefhome.php">
+<!--refresh page when submit-->
+   <!--<p><input type="text" name="sininfo" size="6">-->
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="findmyinfo"></p>
+</form>
 
 <p>Update Availability:</p>
 <p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
@@ -74,7 +82,6 @@ while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 $db_conn = OCILogon("ora_y2q8", "a33104126", "ug");
 $login = $_COOKIE["username"];
 echo $login; 
-
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
@@ -143,8 +150,8 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){
-	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) == 9){
-	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
+	
+	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = $login");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
 
@@ -154,8 +161,19 @@ if ($db_conn){
 		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SSIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
 	}
 	echo "</table>";
-	} else
-		{echo "Invalid Inputs";}
+	
+		$result = executePlainSQL("select staff_ssin, certificates from chef where staff_ssin = $login");
+	//print		
+	echo "<table>";
+	echo "<tr><th>Sin</th><th>Certificates</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["STAFF_SSIN"] . "</td><td>" . $row["CERTIFICATES"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
+	
+	
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
@@ -207,6 +225,16 @@ if ($db_conn){
 	if (array_key_exists('updatecert', $_POST)){
 	executePlainSQL("UPDATE Chef SET certificates = '".$_POST['cert']."' WHERE staff_ssin = '".$_POST['sincert']."'");
 	echo "Certificates changed.";
+	$result = executePlainSQL("select staff_ssin, certificates from chef where staff_ssin = '".$_POST['sincert']."'");
+	//print		
+	echo "<table>";
+	echo "<tr><th>Sin</th><th>Certificates</th></tr>";
+
+	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		echo "<tr><td>" . $row["STAFF_SSIN"] . "</td><td>" . $row["CERTIFICATES"] . "</td></tr>"; 
+	}
+	echo "</table>";
+	OCICommit($db_conn);
 	OCICommit($db_conn);
 	}
 
