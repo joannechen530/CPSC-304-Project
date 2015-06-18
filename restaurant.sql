@@ -1,163 +1,169 @@
 /* Initialize tables and instances */
 
 
-drop table Visits;
-drop table Review;
-drop table WorksAt;
-drop table HasWorkedAt;
-drop table SellsDish;
+--Initializing (drop tables)
+
+drop table Customer;
+drop table Staff;
+drop table Manager;
 drop table Waiter;
 drop table Chef;
 drop table Supervises;
-drop table Customer;
+drop table Restaurant;
 drop table Branch_city;
 drop table Branch_prov;
 drop table Branch;
-drop table Restaurant;
-drop table Manager;
-drop table Staff;
+drop table SellsDish;
+drop table WorksAt;
+drop table HasWorkedAt;
+drop table Visits;
+drop table Review;
 
-
+---------------------------------------
+--Create tables
 
 CREATE TABLE Customer
 	(username CHAR(20) not null,
-	phone CHAR(50), 
-	pw CHAR(50) not null, 
+	phone CHAR(10) UNIQUE, 
 	PRIMARY KEY (username));
  
 grant select on Customer to public;
  
 CREATE TABLE Staff
-	(ssin INT not null,
+	(sin INT not null,
 	name CHAR(50) null,
 	pw CHAR(50) null,
 	availability CHAR(200) null,
-	PRIMARY KEY (ssin));
+	PRIMARY KEY (sin));
  
 grant select on Staff to public;
 
  CREATE TABLE Manager
- 	(staff_ssin INT not null references staff(ssin),
-	PRIMARY KEY (staff_ssin));
+ 	(sin INT not null);
  	
 grant select on Manager to public;
 
 CREATE TABLE Waiter
-	(staff_ssin INT not null references staff(ssin), 
+	(sin INT not null, 
 	shifts CHAR(200) null,
-	PRIMARY KEY(staff_ssin));
+	PRIMARY KEY(sin),
+	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on Waiter to public;
  
 CREATE TABLE Chef
-	(staff_ssin INT not null references staff(ssin),
-	certificates CHAR(200) null,
+	(sin INT not null,
 	schedule CHAR(200) null,
-	PRIMARY KEY(staff_ssin));
+	certificates CHAR(200) null,
+	
+	PRIMARY KEY(sin),
+	FOREIGN KEY (sin) REFERENCES Staff ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on Chef to public;
 
 CREATE TABLE Supervises
 	(sr_sin INT not null,
-	jr_sin INT not null,
-	FOREIGN KEY (sr_sin) REFERENCES staff(ssin)
-  		ON DELETE CASCADE,
-	FOREIGN KEY (jr_sin) REFERENCES staff(ssin)
-  		ON DELETE CASCADE);
+	jr_sin INT not null);
 
 grant select on Supervises to public;
 
 CREATE TABLE Restaurant
 	(name CHAR(50) not null,
-	rtype CHAR(50) null,
-	s_date INT null,
+	type CHAR(50) null,
+	s_date DATE null,
 	PRIMARY KEY(name));
 
 grant select on Restaurant to public;
 
-CREATE TABLE Branch
-	(pc CHAR(7),
-	addr CHAR(50),
-	s_date INT,
-	av_rating INT,
-	phone INT,
-	capacity INT,
-	bname CHAR(50) NOT NULL,
-	ssin INT NOT NULL, 
-	performance INT, 
-	budget INT,
-	PRIMARY KEY (pc),
-	FOREIGN KEY (bname) REFERENCES Restaurant(name)
-  		ON DELETE CASCADE,
-	FOREIGN KEY(ssin) REFERENCES Manager(staff_ssin)
-  		ON DELETE CASCADE);
-		
-grant select on Branch to public;
-
 CREATE TABLE Branch_city
 	(pc CHAR(7),
 	city CHAR(20),
-	PRIMARY KEY (pc),
-	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+	PRIMARY KEY(pc));
 	
 grant select on Branch_city to public;
 
 CREATE TABLE Branch_prov
 	(pc CHAR(7),
 	province CHAR(20),
-	PRIMARY KEY (pc),
-	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+	PRIMARY KEY(pc));
 		
 grant select on Branch_prov to public;
 
+CREATE TABLE Branch
+	(pc CHAR(7),
+	addr CHAR(50),
+	s_date DATE,
+	av_rating INT,
+	phone CHAR(10),
+	capacity INT,
+	name CHAR(20) NOT NULL,
+	sin INT NOT NULL, 
+	performance INT, 
+	budget INT,
+	PRIMARY KEY(pc),
+	FOREIGN KEY(name) REFERENCES Restaurant(name)
+  		ON DELETE CASCADE
+  		ON UPDATE CASCADE
+	FOREIGN KEY(sin) REFERENCES Manager(sin)
+  		ON DELETE SET DEFAULT
+		ON UPDATE CASCADE);
+		
+grant select on Branch to public;
+
 CREATE TABLE SellsDish
-	(rname CHAR(50) not null,
-	dname CHAR(200) not null,
+	(restaurant_name CHAR(200) not null,
+	dish_name CHAR(200) not null,
 	price INT null,
 	popularity INT null,
-	PRIMARY KEY (rname, dname),
-	FOREIGN KEY (rname) REFERENCES Restaurant(name) 
-		ON DELETE CASCADE);
+	PRIMARY KEY(restaurant_name, dish_name),
+	FOREIGN KEY(restaurant_name) REFERENCES Restaurant ON DELETE CASCADE, ON UPDATE CASCADE);
  
 grant select on SellsDish to public;
 
 CREATE TABLE WorksAt
-	(ssin INT,
+	(sin INT,
 	pc CHAR(7),
 	since INT, 
 	pos CHAR(50),
 	salary INT,
-	PRIMARY KEY (ssin, pc),
-	FOREIGN KEY (ssin) REFERENCES Staff(ssin)
-  		ON DELETE CASCADE,
+	PRIMARY KEY (sin, pc),
+	FOREIGN KEY (sin) REFERENCES Staff(sin),
+  		ON DELETE CASCADE
+  		ON UPDATE CASCADE
 	FOREIGN KEY (pc) REFERENCES Branch(pc)
-		ON DELETE CASCADE);
+		ON DELETE SET DEFAULT
+	  	ON UPDATE CASCADE);
 	  	
 grant select on WorksAt to public;
 
 CREATE TABLE HasWorkedAt
-	(ssin INT,
+	(sin INT,
 	pc CHAR(7),
 	sfrom INT,
-	sto INT,
+	to INT,
 	pos CHAR(50),
 	salary INT,
-	PRIMARY KEY (ssin,pc),
-	FOREIGN KEY (ssin) REFERENCES Staff(ssin)
-  		ON DELETE CASCADE,
-	FOREIGN KEY (pc) REFERENCES Branch(pc)
-  		ON DELETE CASCADE);
+	PRIMARY KEY(sin,pc),
+	FOREIGN KEY(sin) REFERENCES Staff(sin),
+  		ON DELETE CASCADE
+  		ON UPDATE CASCADE
+	FOREIGN KEY(pc) REFERENCES Branch(pc)
+  		ON DELETE SET DEFAULT
+  		ON UPDATE CASCADE);
   	
 grant select on HasWorkedAt to public;
 
 CREATE TABLE Visits
 	(username CHAR(20),
 	pc CHAR(7) NOT NULL,
-	v_date INT,
-	num INT,
-	PRIMARY KEY(username,pc,v_date),
-	FOREIGN KEY(username) REFERENCES Customer(username) ON DELETE CASCADE,
-	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+	v_date INT,	
+	PRIMARY KEY(username,pc),
+	FOREIGN KEY(username) REFERENCES Customer(username),
+  		ON DELETE CASCADE
+  		ON UPDATE CASCADE
+	FOREIGN KEY(pc) REFERENCES Branch (pc)
+		ON DELETE SET DEFAULT
+  		ON UPDATE CASCADE);
   		
 grant select on Visits to public;
  
@@ -165,84 +171,91 @@ CREATE TABLE Review
 	(username CHAR(20),
 	pc CHAR(7),
 	rating INT,
-	p_date int,
-	rcomment CHAR(300),
+	p_date DATE,
+	comment CHAR(300),
 	PRIMARY KEY(username, pc),
-	FOREIGN KEY(username) REFERENCES Customer(username) ON DELETE CASCADE,
-	FOREIGN KEY(pc) REFERENCES Branch(pc) ON DELETE cascade);
+	FOREIGN KEY(username) REFERENCES Customer(username)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+	FOREIGN KEY(pc) REFERENCES Branch(pc)
+	  	ON DELETE SET DEFAULT
+		ON UPDATE CASCADE);
 		
 grant select on Review to public;
 
+--------------------------------------------
+--Inserting instances
 
-
-
-
-insert into Customer
-values('TheEater56', '416 555-0100', 'c123');
+--Customer
 
 insert into Customer
-values('FoodieFoo', '604 666-0200', 'c456');
+values('TheEater56', '416 555-0100');
 
 insert into Customer
-values('CheeseBurgo', '741 888-0300', 'c999');
+values('FoodieFoo', '604 666-0200');
 
 insert into Customer
-values('ieatyou36', '250 000-0400', 'c111');
+values('CheeseBurgo', '741 888-0300');
 
 insert into Customer
-values('user3333', '778 333-0500', 'c000');
+values('ieatyou36', '250 000-0400');
+
+insert into Customer
+values('user3333', '778 333-0500');
 
 
+--Staff
  
 insert into Staff
 values (165867486, 'Charlotte', 'password1', 'Mon,Tues,Fri');
 
 insert into Staff
-values (111222333, 'Bob', 'password2', 'Always'); 
+values (111222333, 'Bob', 'password2', 'Always'); --Manager
 
 insert into Staff
-values (444888555, 'Kate', 'password3', 'Weekends'); 
+values (444888555, 'Kate', 'password3', 'Weekends'); --waiter
 
 insert into Staff
-values (222999666, 'Jake', 'password4', 'Always'); 
+values (222999666, 'Jake', 'password4', 'Always'); --waiter
 
 insert into Staff
-values (555666999, 'Jake', 'password5', 'Weekdays');
+values (555666999, 'Jake', 'password5', 'Weekdays'); --chef
 
 insert into Staff
-values (486957496, 'Sara', 'password6', 'Mon'); 
+values (486957496, 'Sara', 'password6', 'Mon'); --waiter
 
 insert into Staff
-values (444978690, 'Mike', 'password7', 'Weekend'); 
+values (444978690, 'Mike', 'password7', 'Weekend'); --waiter
 
 insert into Staff
-values (220996978, 'Eva', 'password8', 'Tues,Thurs'); 
+values (220996978, 'Eva', 'password8', 'Tues,Thurs'); --waiter
 
 insert into Staff
-values (285769686, 'Pikachu', 'password9', 'Always'); 
+values (285769686, 'Pikachu', 'password9', 'Always'); --chef
 
 insert into Staff
-values (666888777, 'Groot', 'password10', 'Always'); 
+values (666888777, 'Groot', 'password10', 'Always'); --chef
 
 insert into Staff
-values (334455668, 'Wolverine', 'password11', 'Always'); 
+values (334455668, 'Wolverine', 'password11', 'Always'); --chef
 
 insert into Staff
-values (229604950, 'Ironman', 'password12', 'Always'); 
+values (229604950, 'Ironman', 'password12', 'Always'); --chef
 
 insert into Staff
-values (534534999, 'Ketchup', 'password13', 'Always'); 
+values (534534999, 'Ketchup', 'password13', 'Always'); --Manager
 
 insert into Staff
-values (999999999, 'Steph', 'password14', 'Always'); 
+values (999999999, 'Steph', 'password14', 'Always'); --Manager
 
 insert into Staff
-values (812837478, 'Honey', 'password15', 'Always'); 
+values (812837478, 'Honey', 'password15', 'Always'); --Manager
 
 insert into Staff
-values (134585289, 'Sugar', 'password15', 'Always');
+values (134585289, 'Sugar', 'password15', 'Always'); --Manager
 
 
+--Manager 
 
 insert into Manager
 values(111222333);
@@ -260,8 +273,8 @@ insert into Manager
 values(812837478);
 
 
-
-
+--Waiter
+ 
 insert into Waiter
 values(222999666, 'Mon, Tues, Wed, Thurs, Fri: 8-4');
 
@@ -278,6 +291,7 @@ insert into Waiter
 values(444888555, 'Sat: 9-5, Sun: 9-5');
 
 
+--Chef
  
 insert into Chef
 values(555666999, 'Food safe', 'Mon, Tues, Wed, Thurs, Fri: 8-4');
@@ -295,55 +309,43 @@ insert into Chef
 values(229604950, 'College diploma, food safe, university bachelors', 'Sat, Sun: 9-5');
 
 
-insert into Supervises
-values(812837478, 334455668);
+--Supervises
 
 insert into Supervises
-values(999999999, 222999666);
+values('111222333', '334455668');
 
 insert into Supervises
-values(111222333, 220996978);
+values('999999999', '222999666');
 
 insert into Supervises
-values(999999999, 555666999);
+values('111222333', '220996978');
 
 insert into Supervises
-values(111222333, 229604950);
+values('534534999', '555666999');
 
+insert into Supervises
+values('812837478', '229604950');
+
+
+--Restaurant
+ 
+insert into Restaurant
+values('McDonald’s', 'American', '1980-01-01');
 
 insert into Restaurant
-values('McDonalds', 'American', 19800101);
+values('Sushi Town', 'Japanese', '2009-09-06');
 
 insert into Restaurant
-values('Sushi Town', 'Japanese', 20090906);
+values('Le Crocodile', 'French', '2005-03-31');
 
 insert into Restaurant
-values('Le Crocodile', 'French', 20050331);
+values('Italian Kitchen', 'Italian', '1996-02-29');
 
 insert into Restaurant
-values('Italian Kitchen', 'Italian', 19960229);
-
-insert into Restaurant
-values('Peaceful', 'Chinese', 20111111);
+values('Peaceful', 'Chinese', '2011-11-11');
 
 
-
-insert into Branch
-values('V1V 1V2', '1010 Main Str', 20080114, 4, 6135302998, 70, 'Le Crocodile', 999999999, 4, 9999);
-
-insert into Branch
-values('V5E 2T2', '6218 Red Bay', 20030520, 5, 2342365345, 30, 'Sushi Town', 534534999, 4, 6000);
-
-insert into Branch
-values('V8R 2T5', '891 Clear Gate Acres', 20051204, 4, 3453432121, 120, 'McDonalds', 134585289, 3, 7000);
-
-insert into Branch
-values('S4V 9F9', '742 Rustic Street', 20080821, 3, 5667778342, 240, 'Peaceful', 111222333, 3, 4000);
-
-insert into Branch
-values('S6B 7W5', '254 Thunder Rise', 2010101, 2, 1341345645, 40, 'Peaceful', 812837478, 2, 2500);
-
-
+--Branch
 
 insert into Branch_city
 values('V1V 1V2', 'Toast');
@@ -375,15 +377,44 @@ values('S4V 9F9', 'BC');
 insert into Branch_prov
 values('S6B 7W5', 'NS');
 
+insert into Branch
+values('V1V 1V2', '1010 Main Str', 20080114, 4, 6135302998, 70, 'Le Crocodile', 123123123, 4, 9999);
 
+insert into Branch
+values('V5E 2T2', '6218 Red Bay', 20030520, 5, 2342365345, 30, 'Sushi Town', 249585833, 4, 6000);
+
+insert into Branch
+values('V8R 2T5', '891 Clear Gate Acres', 20051204, 4, 3453432121, 120, 'McDonald’s', 112312332, 3, 7000);
+
+insert into Branch
+values('S4V 9F9', '742 Rustic Street', 20080821, 3, 5667778342, 240, 'Peaceful', 301929393, 3, 4000);
+
+insert into Branch
+values('S6B 7W5', '254 Thunder Rise', 2010101, 2, 1341345645, 40, 'Peaceful', 201010203, 2, 2500);
+
+
+--SellsDish
+ 
 insert into SellsDish
-values('McDonalds', 'cheeseburger', 3, 2);
+values('McDonald’s', 'cheeseburger', 3, 2);
 
 insert into SellsDish
 values('Sushi Town', 'crunch roll', 6, 2);
 
 insert into SellsDish
+values('Sushi Town', 'tuna sashimi', 7, 3);
+
+insert into SellsDish
+values('Sushi Town', 'california roll', 4, 1);
+
+insert into SellsDish
 values('Le Crocodile', 'salad', 4, 0);
+
+insert into SellsDish
+values('Le Crocodile', 'wrap', 6, 4);
+
+insert into SellsDish
+values('Le Crocodile', 'soup', 3, 5);
 
 insert into SellsDish
 values('Italian Kitchen', 'meatball', 4, 1);
@@ -391,24 +422,79 @@ values('Italian Kitchen', 'meatball', 4, 1);
 insert into SellsDish
 values('Peaceful', 'noodles', 6, 1);
 
+insert into SellsDish
+values('McDonald’s', 'chicken nuggets', 4, 5);
+
+insert into SellsDish
+values('McDonald’s', 'big mac', 7, 5);
+
+insert into SellsDish
+values('McDonald’s', 'french fries', 3, 1);
+
+insert into SellsDish
+values('Peaceful', 'fried rice', 5, 1);
+
+insert into SellsDish
+values('Peaceful', 'sweet and sour pork', 10, 2);
+
+insert into SellsDish
+values('Peaceful', 'stir fry', 6, 3);
+
+insert into SellsDish
+values('Italian Kitchen', 'spaghetti', 10, 2);
+
+insert into SellsDish
+values('Italian Kitchen', 'salad', 9, 3);
 
 
+
+--WorksAt
 
 insert into WorksAt
 values(555666999, 'V1V 1V2', 20100530, 'Chef', 15);
 
 insert into WorksAt
-values(444888555, 'V5E 2T2', 20030520, 'Waiter', 10);
+values(285769686, 'V1V 1V2', 20100530, 'Chef', 15);
+
+insert into WorksAt
+values(666888777, 'S4V 9F9', 20131010, 'Chef', 14);
+
+
+
 
 insert into WorksAt
 values(222999666, 'V1V 1V2', 20100530, 'Waiter', 11);
 
 insert into WorksAt
-values(165867486, 'V8R 2T5', 20051204, 'Dish Washer', 9);
+values(486957496, 'V1V 1V2', 20100530, 'Waiter', 11);
 
 insert into WorksAt
-values(334455668, 'S4V 9F9', 20131010, 'Chef', 14);
+values(444978690, 'V1V 1V2', 20100530, 'Waiter', 11);
 
+
+insert into WorksAt
+values(165867486, 'V8R 2T5', 20051204, 'Dish Washer', 9);
+
+
+insert into WorksAt
+values(111222333, 'S4V 9F9', 20131010, 'Manager', 14);
+
+insert into WorksAt
+values(999999999, 'V1V 1V2', 20131010, 'Manager', 15);
+
+insert into WorksAt
+values(534534999, 'V5E 2T2', 20131010, 'Manager', 12);
+
+insert into WorksAt
+values(134585289, 'V8R 2T5', 20131010, 'Manager', 12);
+
+insert into WorksAt
+values(812837478, 'S6B 7W5', 20131010, 'Manager', 13);
+
+
+
+
+--HasWorkedAt
 
 insert into HasWorkedAt
 values(334455668, 'S6B 7W5', 20100429, 20130611, 'Chef', 12);
@@ -426,26 +512,28 @@ insert into HasWorkedAt
 values(229604950, 'S4V 9F9', 20110921, 20120101, 'Chef', 12);
 
 
+--Visits
 
 insert into Visits
-values('TheEater56', 'V5E 2T2', 20120330, 4);
+values('TheEater56', 'V5E 2T2', 20120330);
 
 insert into Visits
-values('TheEater56', 'V5E 2T2', 20110909, 2);
+values('TheEater56', 'V5E 2T2', 20110909);
 
 insert into Visits
-values('TheEater56', 'S4V 9F9', 20140520, 3);
+values('TheEater56', 'S4V 9F9', 20140520);
 
 insert into Visits
-values('CheeseBurgo', 'V8R 2T5', 20081230, 5);
+values('CheeseBurgo', 'V8R 2T5', 20081230);
 
 insert into Visits
-values('user3333', 'V1V 1V2', 20130511, 9);
+values('user3333', 'V1V 1V2', 20130511);
 
 insert into Visits
-values('FoodieFoo', 'V1V 1V2', 20130511, 2);
+values('FoodieFoo', 'V1V 1V2', 20130511);
 
 
+--Review
 
 insert into Review
 values('TheEater56', 'V5E 2T2', 5, 20110912, 'SO GOOD OMG I LOVED IT');
@@ -461,7 +549,3 @@ values('TheEater56', 'S4V 9F9', 3, 20140601, 'it was ok');
 
 insert into Review
 values('FoodieFoo', 'V1V 1V2', 5, 20130112, 'Best. Place. Ever. Food is top notch, so tasty and full of flavor. The waitresses are also hot as hell. Would go again many times, no hesitation.');
-
-
-
-
