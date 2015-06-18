@@ -56,7 +56,7 @@ echo $login;
 
 
 <?php
-$db_conn = OCILogon("ora_r1b9", "a35876135", "ug");
+$db_conn = OCILogon("ora_y2q8", "a33104126", "ug");
 
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
@@ -145,9 +145,9 @@ if ($db_conn){
 	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) == 9){
 	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE ssin = '".$_POST['sinavail']."'");
 	echo "Availability changed.";
-	OCICommit($db_conn);
+	
 	} else {echo "Invalid Inputs";}
-
+	OCICommit($db_conn);
 	} else
 
 	if (array_key_exists('supervisor', $_POST)){
@@ -168,7 +168,7 @@ if ($db_conn){
 
 	if (array_key_exists('supervisoremployees', $_POST)){
 	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) == 9){
-	$result = executePlainSQL("select name from staff where ssin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+	$result = executePlainSQL("select name from staff where ssin IN (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
 	echo "<table>";
 	echo "<tr><th>Name</th></tr>";
 
