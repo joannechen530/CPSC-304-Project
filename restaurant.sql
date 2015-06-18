@@ -312,7 +312,7 @@ values(111222333, 229604950);
 
 
 insert into Restaurant
-values('McDonald’s', 'American', 19800101);
+values('McDonalds', 'American', 19800101);
 
 insert into Restaurant
 values('Sushi Town', 'Japanese', 20090906);
@@ -335,7 +335,7 @@ insert into Branch
 values('V5E 2T2', '6218 Red Bay', 20030520, 5, 2342365345, 30, 'Sushi Town', 534534999, 4, 6000);
 
 insert into Branch
-values('V8R 2T5', '891 Clear Gate Acres', 20051204, 4, 3453432121, 120, 'McDonald’s', 134585289, 3, 7000);
+values('V8R 2T5', '891 Clear Gate Acres', 20051204, 4, 3453432121, 120, 'McDonalds', 134585289, 3, 7000);
 
 insert into Branch
 values('S4V 9F9', '742 Rustic Street', 20080821, 3, 5667778342, 240, 'Peaceful', 111222333, 3, 4000);
@@ -377,7 +377,7 @@ values('S6B 7W5', 'NS');
 
 
 insert into SellsDish
-values('McDonald’s', 'cheeseburger', 3, 2);
+values('McDonalds', 'cheeseburger', 3, 2);
 
 insert into SellsDish
 values('Sushi Town', 'crunch roll', 6, 2);
