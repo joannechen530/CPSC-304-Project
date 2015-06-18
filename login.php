@@ -283,101 +283,48 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
      $pass = $_POST['pass'];
 
 
-     $resultt = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
-     $roww = OCI_Fetch_Array($resultt, OCI_BOTH);
+     $result = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
+     $row = OCI_Fetch_Array($result, OCI_BOTH);
 
-     if ($roww[0] == $user){
+     if ($row[0] != NULL){
+     	$chef = executePlainSQL("select staff_ssin from Chef where staff_ssin=$user");
+     	$waiter = executePlainSQL("select staff_ssin from Waiter where staff_ssin=$user");
+     	$manager = executePlainSQL("select staff_ssin from Manager where staff_ssin=$user");
+     	$crow = OCI_Fetch_Array($chef, OCI_BOTH);
+     	$wrow = OCI_Fetch_Array($waiter, OCI_BOTH);
+     	$mrow = OCI_Fetch_Array($manager, OCI_BOTH);
 
-     	$cresult = executePlainSQL("SELECT staff_ssin FROM Chef Where staff_ssin = $user");
-     	$crow = OCI_Fetch_Array($cresult, OCI_BOTH);
-     	$wresult = executePlainSQL("SELECT staff_ssin FROM Waiter Where staff_ssin = $user");
-     	$wrow = OCI_Fetch_Array($wresult, OCI_BOTH);
-     	$mresult = executePlainSQL("SELECT staff_ssin FROM Manager Where staff_ssin = $user");
-     	$mrow = OCI_Fetch_Array($mresult, OCI_BOTH);
-
-
-     	if ($crow[0] == $user){
+     	if ($crow[0] != NULL) {
      		setcookie("username", $user);
 			header("location:chefhome.php");
-
- 
-
-    	} else 
-     	if ($wrow[0] == $user){
+     	}
+     	if ($wrow[0] != NULL){
      		setcookie("username", $user);
 			header("location:waithome.php");
-     	} else 
-     		if ($mrow[0] == $user){
-     			setcookie("username", $user);
-				header("location:manhome.php");
-		} else
-			setcookie("username", $user);
-			header("location:genstaffhome.php"); 
-	}
+     	}
+     	if ($mrow[0] != NULL) {
+     		setcookie("username", $user);
+			header("location:manhome.php");
+     	} else {
+     		setcookie("username", $user);
+			header("location:genstaffhome.php");
+     	}
+
+     
+	} else echo "Invalid SIN or password. <br>";
 
      	
-/*
-     	$staffpos = executePlainSQL("SELECT pos from worksat where ssin = $user");
-     	$row = OCI_Fetch_Array($staffpos, OCI_BOTH);
-     	echo $row[0];
-
-		if($row[0] == "Chef"){
-    	 	setcookie("username", $user);
-			header("location:chefhome.php");	
-		}else 
-		if($row[0] == "Waiter"){
-    	 	setcookie("username", $user);
-			header("location:waithome.php");
-		} else 
-		if($row[0] == "Manager"){
-    	 	setcookie("username", $user);
-			header("location:manhome.php");
-		} else{
-			setcookie("username", $user);
-			header("location:manhome.php");
-		}
-
-     } else{
-     	echo "Invalid username or password";
-     }
-*/
-
-  //    	$staffpos = executePlainSQL("SELECT pos from worksat where ssin = $user");
-  //    	$row = OCI_Fetch_Array($staffpos, OCI_BOTH);
-  //    	echo $row[0];
-
-
-  // //    	if (strcmp($row[0], "Manager") == 0){
-  // //    		setcookie("username", $user);
-		// // 	header("location:manhome.php");
-  // //   	 }else 
-
-  // //   	 if(strcmp($row[0], "Waiter") == 0){
-  // //   	 	setcookie("username", $user);
-		// // 	header("location:waithome.php");
-		// // }else 
-
-  //   	 if(strcmp ($row[0], "Chef") == 0){
-  //   	 	setcookie("username", $user);
-		// 	header("location:chefhome.php");
-		// }
-		// }else {
-		// 	setcookie("username", $user);
-		// 	header("location:genstaffhome.php");
-		// }
-
-   	
 }
 
 if(isset($_POST['clogin']))   // it checks whether the user clicked login button or not 
 {
-     $userr = $_POST['cuser'];
-     $passs = $_POST['cpass'];
+     $user = $_POST['cuser'];
+     $pass = $_POST['cpass'];
 
-     $resultt = executePlainSQL("SELECT username from customer where username = '$userr' AND pw = '$passs'");
-     $roww = OCI_Fetch_Array($resultt, OCI_BOTH);
-
-     if($roww[0] == $userr){
+     $result = executePlainSQL("SELECT username from customer where username = '$user' AND pw = '$pass'");
+     $row = OCI_Fetch_Array($result, OCI_BOTH);
+     echo "test".$row[0];
+     if($row[0]!=NULL){
      	setcookie("username", $user);
 		header("location:custhome.php");
      } else{
@@ -386,37 +333,7 @@ if(isset($_POST['clogin']))   // it checks whether the user clicked login button
 
 }
 
-/*
-      if($user == "manager" && $pass == "m123")    
-         {                                       
-        setcookie("username", $user);
-		header("location:manhome.php");
-           //  On Successfull Login redirects to home.php
-        }
-      else if($user == "username" && $pass == "c123")    
-         {                                       
-        setcookie("username", $user);
-		header("location:custhome.php");           //  On Successfull Login redirects to home.php
-        }
-        else if($user == "waiter" && $pass == "w123")    
-         {                                       
-          setcookie("username", $user);
-		header("location:waithome.php");           //  On Successfull Login redirects to home.php
-        }
-        else if($user == "chef" && $pass == "ch123")    
-         {                                       
-          setcookie("username", $user);
-		header("location:chefhome.php");
-         echo '<script type="text/javascript"> window.open("chefhome.php","_self");</script>';            //  On Successfull Login redirects to home.php
-        } else if ($user == "staff" && $pass == "s123") {
-        setcookie("username", $user);
-		header("location:genstaffhome.php");
-		}
-        else
-        {
-            echo "Invalid UserName or Password";        
-        }    
-    */
+
 OCILogoff($db_conn);
  }
  ?>
