@@ -165,7 +165,7 @@ if ($db_conn){
 			OCICommit($db_conn);
 		} else 
 		if (trim($_POST['citybranches']) == ""){
-			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'";
+			$statement = "SELECT * FROM BRANCH_PROV where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -178,7 +178,7 @@ if ($db_conn){
 			echo "</table>";
 		} else
 			if (trim($_POST['provincebranches']) == ""){
-			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'";
+			$statement = "SELECT * FROM BRANCH_CITY where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -190,7 +190,7 @@ if ($db_conn){
 			}
 			echo "</table>";
 		} else {
-			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."' AND PROVINCE = '".$_POST['provincebranches']."' ";
+			$statement = "SELECT * FROM BRANCH b, BRANCH_PROV bp, BRANCH_CITY bc where b.NAME ='".$_POST['rnamebranches']."' AND bc.CITY ='".$_POST['citybranches']."' AND bp.PROVINCE = '".$_POST['provincebranches']."' AND b.pc = bp.pc AND b.pc = bc.pc ";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -230,7 +230,7 @@ if ($db_conn){
 		OCICommit($db_conn);
 	} else 
 	if (array_key_exists('searchforreviews', $_POST)){
-		$result = executePlainSQL("SELECT r.username, r.rating, r.comments from reviews r where r.pc = (select b.pc from branches where b.addr = '".$_POST['addressreview']."' and b.city = '".$_POST['cityreview']."'')");
+		$result = executePlainSQL("SELECT r.username, r.rating, r.comments from review r where r.pc = (select b.pc from branch b, BRANCH_CITY bc where b.pc = bc.pc AND b.addr = '".$_POST['addressreview']."'AND bc.city = '".$_POST['cityreview']."'')");
 			echo "<table>";
 			echo "<tr><th>Username</th><th>Rating</th><th>Comment</th></tr>";
 			while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
@@ -276,7 +276,6 @@ if ($db_conn){
 			echo "</table>";
 		OCICommit($db_conn);
 	}
-
 
 if(isset($_POST['slogin']))   // it checks whether the user clicked login button or not 
 {
