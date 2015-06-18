@@ -150,7 +150,8 @@ function executeBoundSQL($cmdstr, $list) {
 if ($db_conn){
 	if (array_key_exists('searchforbranchesincity', $_POST)){
 		if (trim($_POST['citybranches']) == "" && trim($_POST['provincebranches']) == ""){
-			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."'";
+			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."'";
+			$rrr = executePlainSQL("SELECT pos from worksat where ssin = 555666999");
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -164,7 +165,7 @@ if ($db_conn){
 			OCICommit($db_conn);
 		} else 
 		if (trim($_POST['citybranches']) == ""){
-			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'";
+			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -177,7 +178,7 @@ if ($db_conn){
 			echo "</table>";
 		} else
 			if (trim($_POST['provincebranches']) == ""){
-			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'";
+			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -189,7 +190,7 @@ if ($db_conn){
 			}
 			echo "</table>";
 		} else {
-			$statement = "SELECT * FROM BRANCHES where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."' AND PROVINCE = '".$_POST['provincebranches']."' ";
+			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."' AND PROVINCE = '".$_POST['provincebranches']."' ";
 			$result = executePlainSQL($statement);
 			echo "<br>Got data from table Branches:<br>";
 			echo "<table>";
@@ -275,43 +276,98 @@ if ($db_conn){
 			echo "</table>";
 		OCICommit($db_conn);
 	}
-OCILogoff($db_conn);
-}
+
+
 if(isset($_POST['slogin']))   // it checks whether the user clicked login button or not 
 {
      $user = $_POST['user'];
      $pass = $_POST['pass'];
 
-     //$resultt = executePlainSQL("SELECT ssin from staff where ssin = $user AND pw = $pass");
-     //$roww = OCI_Fetch_Array($resultt, OCI_BOTH);
 
-    //if ($roww[0] == "$user")){
-	//	echo "matching user and pass";
-     	
-     	$staffpos = executePlainSQL("SELECT pos from worksat where ssin = $user");
-     	echo "$staffpos";
-/*
-     	if ($staffpos == 'Manager' ){
+     $resultt = executePlainSQL("SELECT ssin from staff where ssin = $user AND pw = '$pass'");
+     $roww = OCI_Fetch_Array($resultt, OCI_BOTH);
+
+     if ($roww[0] == $user){
+
+     	$cresult = executePlainSQL("SELECT staff_ssin FROM Chef Where staff_ssin = $user");
+     	$crow = OCI_Fetch_Array($cresult, OCI_BOTH);
+     	$wresult = executePlainSQL("SELECT staff_ssin FROM Waiter Where staff_ssin = $user");
+     	$wrow = OCI_Fetch_Array($wresult, OCI_BOTH);
+     	$mresult = executePlainSQL("SELECT staff_ssin FROM Manager Where staff_ssin = $user");
+     	$mrow = OCI_Fetch_Array($mresult, OCI_BOTH);
+
+
+     	if ($crow[0] == $user){
      		setcookie("username", $user);
-			header("location:manhome.php");
-    	 }else 
+			header("location:chefhome.php");
 
-    	 if($staffpos == 'Waiter'){
+ 
+
+    	} else 
+     	if ($wrow[0] == $user){
+     		setcookie("username", $user);
+			header("location:waithome.php");
+     	} else 
+     		if ($mrow[0] == $user){
+     			setcookie("username", $user);
+				header("location:manhome.php");
+		} else
+			setcookie("username", $user);
+			header("location:genstaffhome.php"); 
+	}
+
+     	
+/*
+     	$staffpos = executePlainSQL("SELECT pos from worksat where ssin = $user");
+     	$row = OCI_Fetch_Array($staffpos, OCI_BOTH);
+     	echo $row[0];
+
+		if($row[0] == "Chef"){
+    	 	setcookie("username", $user);
+			header("location:chefhome.php");	
+		}else 
+		if($row[0] == "Waiter"){
     	 	setcookie("username", $user);
 			header("location:waithome.php");
-		}else 
-    	 if($staffpos == 'Chef'){
+		} else 
+		if($row[0] == "Manager"){
     	 	setcookie("username", $user);
-			header("location:chefhome.php");
-		}else {
+			header("location:manhome.php");
+		} else{
 			setcookie("username", $user);
-			header("location:genstaffhome.php");
+			header("location:manhome.php");
 		}
-		*/
-    	 
-   //  } else{
-     	//echo "Invalid Username or Password";
-    // }
+
+     } else{
+     	echo "Invalid username or password";
+     }
+*/
+
+  //    	$staffpos = executePlainSQL("SELECT pos from worksat where ssin = $user");
+  //    	$row = OCI_Fetch_Array($staffpos, OCI_BOTH);
+  //    	echo $row[0];
+
+
+  // //    	if (strcmp($row[0], "Manager") == 0){
+  // //    		setcookie("username", $user);
+		// // 	header("location:manhome.php");
+  // //   	 }else 
+
+  // //   	 if(strcmp($row[0], "Waiter") == 0){
+  // //   	 	setcookie("username", $user);
+		// // 	header("location:waithome.php");
+		// // }else 
+
+  //   	 if(strcmp ($row[0], "Chef") == 0){
+  //   	 	setcookie("username", $user);
+		// 	header("location:chefhome.php");
+		// }
+		// }else {
+		// 	setcookie("username", $user);
+		// 	header("location:genstaffhome.php");
+		// }
+
+   	
 }
 
 if(isset($_POST['clogin']))   // it checks whether the user clicked login button or not 
@@ -319,10 +375,14 @@ if(isset($_POST['clogin']))   // it checks whether the user clicked login button
      $userr = $_POST['cuser'];
      $passs = $_POST['cpass'];
 
-     if (!is_null(executePlainSQL("SELECT username from customer where username = $userr and pw = $passs"))){
+     $resultt = executePlainSQL("SELECT username from customer where username = '$userr' AND pw = '$passs'");
+     $roww = OCI_Fetch_Array($resultt, OCI_BOTH);
+
+     if($roww[0] == $userr){
      	setcookie("username", $user);
 		header("location:custhome.php");
-
+     } else{
+     	echo "Invalid Username or Password";
      }
 
 }
@@ -358,6 +418,8 @@ if(isset($_POST['clogin']))   // it checks whether the user clicked login button
             echo "Invalid UserName or Password";        
         }    
     */
+OCILogoff($db_conn);
+ }
  ?>
 </body>
 </html>
