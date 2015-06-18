@@ -1,0 +1,14 @@
+Project Description:
+
+Our project is Restaurant database containing information about restaurants, their branches, the staff
+and the food served at the restaurants. 
+We have multiple pages for different functionality. 
+First of there is the general/login page, here is the general information about branches 
+and restaurants that everyone (staff or customer) can access, 
+also on this page is the log in for customers and staff to log in. 
+Next is the customer page, here customers can write and view reviews for specific branches. 
+Then there are the 4 staff pages, manager, waiter, chef, and general. 
+Each of them contain certain info that only they can each do, for example the manager page has the most functionality, 
+they can edit staff, update branch info, and also view some more advanced queries such as find the most popular dishes.
+
+Our project schema is for the most part the same as when we started, the main change was the addition of  the customer and review entities. Other than that it is the same.
