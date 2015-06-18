@@ -125,25 +125,25 @@ function executeBoundSQL($cmdstr, $list) {
 
 if ($db_conn){
 
-	if (array_key_exists('findmyinfo', $_POST)){
+	if (array_key_exists('findmyinfo', $_POST)){	
+		OCICommit($db_conn);
 	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) == 9){
 	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
-
+	
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SSIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
 	}
 	echo "</table>";
 
-		OCICommit($db_conn);
 	}else {echo "Invalid Inputs";}
 
 	} else
 
 	if (array_key_exists('updateavail', $_POST)){
 	if(is_numeric($_POST['sinavail']) && strlen($_POST['sinavail']) == 9){
-	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE ssin = '".$_POST['sinavail']."';");
+	executePlainSQL("UPDATE Staff SET availability = '".$_POST['avail']."' WHERE ssin = '".$_POST['sinavail']."'");
 	echo "Availability changed.";
 	OCICommit($db_conn);
 	} else {echo "Invalid Inputs";}
@@ -183,7 +183,7 @@ if ($db_conn){
 
 	if (array_key_exists('findshifts', $_POST)){
 	if(is_numeric($_POST['sinshifts']) && strlen($_POST['sinshifts']) < 200){
-	$result = executePlainSQL("SELECT shifts from waiter where ssin = '".$_POST['sinshifts']."'");
+	$result = executePlainSQL("SELECT shifts from waiter where staff_ssin = '".$_POST['sinshifts']."'");
 
 	echo "<table>";
 	echo "<tr><th>Shifts</th></tr>";
