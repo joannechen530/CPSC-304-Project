@@ -9,7 +9,7 @@ $login = $_COOKIE["username"];
 echo $login; 
 ?>
 
-<p>Find my info: </p>
+<p><bold>My Info: </bold></p>
 <p><font size="2"> SIN</font></p>
 <form method="POST" action="genstaffhome.php">
 <!--refresh page when submit-->
