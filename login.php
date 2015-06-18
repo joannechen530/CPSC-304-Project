@@ -281,7 +281,7 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
 {
      $user = $_POST['user'];
      $pass = $_POST['pass'];
-     if (is_numeric($user) && strlen($user)=9){
+     if (is_numeric($user) && strlen($user)==9){
      	$result = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
      	$row = OCI_Fetch_Array($result, OCI_BOTH);
 
