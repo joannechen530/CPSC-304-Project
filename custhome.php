@@ -131,19 +131,19 @@ if ($db_conn){
 	}else 
 
 	if(array_key_exists ("searchforallreviews", $_POST)){
-	$result = executePlainSQL("SELECT * from review where pc = (select pc from branch where bname = '".$_POST['namereview']."') ");
+	$result = executePlainSQL("SELECT * from review where pc IN (select pc from branch where bname = '".$_POST['namereview']."') ");
 	echo "<table>";
 	echo "<tr><th>Username</th><th>Postal Code</th><th><Rating</th><th>Posting Date</th><th>Comment</th></tr>";
-
+	
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "bla";
 		echo "<tr><td>" . $row["USERNAME"] . "</td><td>" . $row["PC"] . "</td><td>" . $row["RATING"] . "</td><td>" . $row["P_DATE"] . "</td><td>" . $row["RCOMMENT"] . "</td></tr>"; 
 	}
+	
+	
 	echo "</table>";
 
 	OCICommit($db_conn);
 	}
-
 
 OCILogoff($db_conn);
 }
