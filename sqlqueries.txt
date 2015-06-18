@@ -1,0 +1,78 @@
+"select name, s.ssin, pos, salary, pc, since from Staff s, WorksAt w where s.ssin=w.ssin and s.ssin=$login"
+"select pos, salary, pc, sfrom, sto from HasWorkedAt where ssin=$login"
+"select name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'"
+"select name from staff where ssin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')"
+"select name from staff where ssin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')"
+'select s.ssin, name, pc from staff s, worksat w where s.ssin=w.ssin order by s.ssin'
+"select s.ssin, name, pc from Staff s, WorksAt w where s.ssin=$sin and s.ssin=w.ssin "
+"select s.ssin, name, pc from staff s, worksat w where name='$name' and s.ssin=w.ssin order by s.ssin"
+"select s.ssin, name, pc from Staff s, WorksAt w where s.ssin=w.ssin and w.pc='$pc' order by s.ssin"
+"insert into Staff values($sin, '$name', '$pw', '$avail')"
+"insert into WorksAt values($sin, '$pc', $date, '$pos', $sal)"
+"insert int Waiter values($sin, '$sch')"
+"insert into Manager values($sin)"
+"update branch set ssin=$sin where pc='$pc'"
+"insert into Chef values($sin, '$sch', null)"
+"insert into HasWorkedAt select ssin, pc, since as sfrom, $date as sto, pos, salary from WorksAt where ssin=$sin"
+"delete from Chef where staff_ssin=$sin"
+"delete from Manager where staff_ssin=$sin"
+"delete from Waiter where staff_ssin=$sin"
+"delete from WorksAt where ssin=$sin"
+("delete from Staff where ssin = '".$_POST['SINdelete']."' ")
+insert into Supervises values('$spvisor', $sin)
+"delete from Supervises where sr_sin = '$spvisor' and jr_sin=$sin"
+"insert into Supervises values($sin, '$spvisee')"
+delete from Supervises where jr_sin = '$spvisee' and sr_sin=$sin"
+select pos from WorksAt where ssin=$sin
+insert into HasWorkedAt select $sin as ssin, pc, since as sfrom, $date as sto, pos, salary from WorksAt where ssin=$sin"
+"insert into Waiter select $sin as staff_ssin, schedule from Chef where staff_ssin=$sin"
+"delete from Chef where staff_ssin=$sin"
+"insert into Waiter values($sin, null)"
+delete from Manager where staff_ssin=$sin"
+"insert into Chef select $sin as staff_ssin, shifts as schedule, null as certificates from Waiter, where staff_ssin=$sin;"
+"delete from Waiter where staff_ssin=$sin"
+"insert into Chef values($sin, null, null)"
+"delete from Manager where staff_ssin=$sin"
+update Branch set ssin=$sin where pc='$pc
+"insert into manager values($sin)"
+"delete from waiter where staff_ssin=$sin"
+"update Branch set ssin=$sin where pc='$pc'"
+"delete from Chef where staff_ssin=$sin"
+update Branch set ssin=$sin where pc='$pc
+"update WorksAt set pos='$pos' where ssin=$sin"
+update WorksAt set salary=$sal where ssin=$sin"
+update WorksAt set pc='$pc' where ssin=$sin
+"update WorksAt set since=$date where ssin=$sin"
+"update Waiter set shifts='$sch' where staff_ssin=$sin"
+"update Chef set schedule='$sch' where staff_ssin=$sin"
+"select count(*) from WorksAt where salary > (select AVG(salary) from Staff natural inner join WorksAt)"
+"update WorksAt set salary = (select AVG(salary) FROM Staff natural inner join WorksAt)
+ 						 where salary > (select AVG(salary) from Staff natural inner join WorksAt)"
+ "update branch set budget=$budget, performance=$performance"
+select pc from Branch b, Staff s where b.ssin=s.ssin and s.name='$name'
+"select performance, pc, ssin from Branch where bname='$res' order by performance desc"
+select dname from SellsDish sd1 where rname = '$res'
+						and not exists (select * from SellsDish sd2 where sd1.popularity < sd2.popularity and rname ='$res')"
+select SUM(num) FROM Visits WHERE (v_date>=$from OR v_date<=$to) AND pc='$pc'"
+SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = $login"
+UPDATE Staff SET availability = '".$_POST['avail']."' WHERE ssin = '".$_POST['sinavail']."'"
+select name from staff where ssin = (select sr_sin from supervises where jr_sin = '".$_POST['sinsuper']."')"
+select ssin, name from staff where ssin IN (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')"
+"UPDATE Chef SET certificates = '".$_POST['cert']."' WHERE staff_ssin = '".$_POST['sincert']."'")
+"select staff_ssin, certificates from chef where staff_ssin = '".$_POST['sincert']."'"
+select schedule from chef where staff_ssin = '".$_POST['sinshifts']."'"
+"INSERT into customer values ('".$_POST['newuser']."', '".$_POST['newphone']."', '".$_POST['newpw']."')"
+"SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."'"
+"SELECT * FROM BRANCH_PROV where NAME ='".$_POST['rnamebranches']."' AND PROVINCE ='".$_POST['provincebranches']."'"
+SELECT * FROM BRANCH_CITY where NAME ='".$_POST['rnamebranches']."' AND CITY ='".$_POST['citybranches']."'"
+SELECT * FROM BRANCH b, BRANCH_PROV bp, BRANCH_CITY bc where b.NAME ='".$_POST['rnamebranches']."' AND bc.CITY ='".$_POST['citybranches'].
+SELECT rname, type, s_date from Restaurant where rname = '".$_POST['rnameinfo']."';"
+"SELECT dname, price, popularity FROM SellsDish WHERE rname=:'".$_POST['rnamedishes']."'
+SELECT r.username, r.rating, r.comments from review r where r.pc = (select b.pc from branch b, BRANCH_CITY bc where b.pc = bc.pc AND b.addr = '".$_POST['addressreview']."'AND bc.city = '".$_POST['cityreview']."'')"
+
+CREATE VIEW PlacesWithDish AS SELECT DISTINCT rname FROM Restaurant natural inner join SellsDish WHERE dname like '%'".$_POST['dishname']."'&'"
+SELECT rname, pc FROM Branch  WHERE rname in PlacesWithDish AND  av_rating = (SELECT MAX(av_rating) FROM Branch GROUP BY rname HAVING rname IN PlacesWithDish)"
+"SELECT pc FROM Branch b1 WHERE rname = '".$_POST['reshigh']."' AND NOT EXIST (SELECT * FROM Branch b2 WHERE b1.rating < b2.rating)"
+"SELECT dname FROM SellsDish sd1 WHERE rname = '".$_POST['dishres']."' AND NOT EXIST (SELECT * FROM SellsDish sd2 WHERE sd1.popularity < sd2.popularity)"
+SELECT username from customer where username = '$user' AND pw = '$pass'"
+select ssin from staff where ssin = $user AND pw = '$pass'"
