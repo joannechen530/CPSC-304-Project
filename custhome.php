@@ -9,14 +9,6 @@ $login = $_COOKIE["username"];
 echo $login; 
 ?>
 
-<p>Create user: </p>
-<p> Username&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phone#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Password</p>
-<form method="POST" action="custhome.php">
-<!--refresh page when submit-->
-   <p><input type="text" name="newuser" size="6"><input type="text" name="newphone" size="6"><input type="text" name="newpw" size="6">
-<!--define variables to pass the value-->      
-<br><br><input type="submit" value="Create User" name="createuser"></p>
-</form>
 
 <p>Write a review: </p>
 <p> Username&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PostalCode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Rating&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date</p>
@@ -117,15 +109,6 @@ function executeBoundSQL($cmdstr, $list) {
 
 if ($db_conn){
 
-	if (array_key_exists('createuser', $_POST)){
-		if ( strlen($_POST['newuser']) < 20 && strlen($_POST['newphone']) <50 && strlen($_POST['newpw']) < 50){
-		executePlainSQL("INSERT into customer values ('".$_POST['newuser']."', '".$_POST['newphone']."', '".$_POST['newpw']."')");
-		echo "User created";
-	}else {
-		echo "Invalid Inputs";}
-
-		OCICommit($db_conn);
-	} 
 
 	if (array_key_exists('submitreview', $_POST)){
 		if ( strlen($_POST['pcreview']) < 8 && is_numeric($_POST['datereview']) && $_POST['datereview'] < 20160101 && strlen($_POST['commentreview']) < 300){
