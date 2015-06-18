@@ -80,8 +80,7 @@ while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 
 <?php
 $db_conn = OCILogon("ora_y2q8", "a33104126", "ug");
-$login = $_COOKIE["username"];
-echo $login; 
+
 
 function executePlainSQL($cmdstr) { //takes a plain (no bound variables) SQL command and executes it
 	//echo "<br>running ".$cmdstr."<br>";
