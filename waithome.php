@@ -6,7 +6,7 @@
 <br>
 <?php 
 $db_conn = OCILogon("ora_l2r8", "a32433120", "ug");
-$login = 334455668;//$_COOKIE["username"];!!!
+$login = $_COOKIE["username"];
 echo "<p><font size='4'> My Info: </font></p>";
 $result = executePlainSQL("select name, s.ssin, pos, salary, pc, since from Staff s, WorksAt w where s.ssin=w.ssin and s.ssin=$login");
 $row = OCI_Fetch_Array($result, OCI_BOTH);
