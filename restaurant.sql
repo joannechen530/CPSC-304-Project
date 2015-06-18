@@ -59,7 +59,11 @@ grant select on Chef to public;
 
 CREATE TABLE Supervises
 	(sr_sin INT not null,
-	jr_sin INT not null);
+	jr_sin INT not null,
+	FOREIGN KEY (sr_sin) REFERENCES staff(ssin)
+  		ON DELETE CASCADE,
+	FOREIGN KEY (jr_sin) REFERENCES staff(ssin)
+  		ON DELETE CASCADE);
 
 grant select on Supervises to public;
 

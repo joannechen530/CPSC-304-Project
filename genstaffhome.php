@@ -120,13 +120,17 @@ if ($db_conn){
 	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
-
-	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SSIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+	echo "</table>";
+	
+		OCICommit($db_conn);
+	
+	echo "<table>";
+	while (($row = OCI_Fetch_Array($result, OCI_BOTH)) != false) {
+		echo "<tr><td>" . $row['NAME'] . "</td><td>" . $row['SSIN'] . "</td><td>" . $row['AVAILABILITY'] . "</td><td>" . $row['SINCE'] . "</td><td>" . $row['POS'] . "</td><td>" . $row['SALARY'] . "</td></tr>"; 
 	}
 	echo "</table>";
 
-		OCICommit($db_conn);
+		
 	}else {echo "Invalid Inputs";}
 
 	} else
