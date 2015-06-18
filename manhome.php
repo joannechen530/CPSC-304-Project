@@ -109,7 +109,7 @@ while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 
 <form action='' method='post'>
 <p><b>Delete Staff:</b></p>
-<p> <font size='2'> SIN: </font><input type='text' name=SINDelete><br>
+<p> <font size='2'> SIN: </font><input type='text' name='SINDelete'><br>
 	<input type='submit' name='deletestaff' value='Delete'>
 </p></form>
 
@@ -417,7 +417,7 @@ if ($db_conn){
 			OCICommit($db_conn);
 		} else echo "Invalid Input. <br>";
 	}else if (array_key_exists('deletestaff', $_POST)){
-		if(is_numeric('".$_POST['SINdelete']."') && strlen('".$_POST['SINdelete']."')==9){
+		if(is_numeric($_POST['SINdelete']) && strlen($_POST['SINdelete'])==9){
 			executePlainSQL("delete from Staff where ssin = '".$_POST['SINdelete']."' ");
 			echo "Delete Succesful! <br>";
 		}else {
