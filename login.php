@@ -281,7 +281,9 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
 {
      $user = $_POST['user'];
      $pass = $_POST['pass'];
-     if (is_numeric($user) && strlen($user)==9){
+     if (!is_numeric($user) || strlen($user)!=9){ 
+     	echo "Invalid SIN. <br>";
+     } else {
      	$result = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
      	$row = OCI_Fetch_Array($result, OCI_BOTH);
 
@@ -295,22 +297,22 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
 
      		if ($crow[0] != NULL) {
      			setcookie("username", $user);
-			header("location:chefhome.php");
+				header("location:chefhome.php");
      		}
-     		if ($wrow[0] != NULL){
+     		else if ($wrow[0] != NULL){
      			setcookie("username", $user);
-			header("location:waithome.php");
+				header("location:waithome.php");
      		}
-     		if ($mrow[0] != NULL) {
+     		else if ($mrow[0] != NULL) {
      			setcookie("username", $user);
-			header("location:manhome.php");
+				header("location:manhome.php");
      		} else {
      			setcookie("username", $user);
-			header("location:genstaffhome.php");
+				header("location:genstaffhome.php");
      		}
      		
-	 } else echo "Invalid SIN or password. <br>";
-     } else echo "Invalid SIN. <br>";
+	 	} else echo "Invalid SIN or password. <br>";
+     } 
 
      
 
