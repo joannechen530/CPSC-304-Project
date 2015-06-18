@@ -52,7 +52,7 @@ echo $login;
 
 <p><b>Find Staff:</b></p>
 <form action="manhome.php" method="post">
-<p> <input type='submit' name='fs_list' value='View staff list'></p>
+<p> <input type='submit' name='sub_fs_list' value='View staff list'></p>
 </form>
 <form action="manhome.php" method='post'> 
 <p> <font size='2'>SIN: </font><input type='text' name='fs_SIN'>
@@ -141,11 +141,11 @@ echo $login;
 <form action='manhome.php' method='post'>
 <font size='3'>Transfer all the staff members that have worked at <input type='text' name='es_transfer' value='Branch Postal Code'> but no longer work there to that branch in their current positions.</font>
 <input type='submit' name='sub_es_transfer' value='Transfer'>
-</form><br> -->
+</form><br> 
 <form action='manhome.php' method='post'>
 <font size='3'>Find the waiter with the highest pay and make him supervise all the other waiters</font>
 <input type='submit' name='sub_es_supall' value='Set'></form>
-<br><br><br>
+<br><br><br>-->
 
 <p><b>Update Branch Info:</b></p>
 <form action='manhome.php' method='post'>
@@ -157,7 +157,7 @@ echo $login;
 <br><br>
 
 <p><b>Others:</b></p>
-<form action='manhome.php' mehtod='post'>
+<form action='manhome.php' method='post'>
 <font size='3'>Find branches managed by <input type='text' name='o_man' value='Manager Name'></font>
 <input type='submit' name='sub_o_man' value='Search'></form><br>
 
@@ -262,7 +262,6 @@ function printResult($result) { //prints results from a select statement
 
 function printSQL($result, $n) {
 	echo "in print";
-	echo "<table>";
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 		echo "<tr>";
 		for($i=0; $i < $n; $i++) {
@@ -282,12 +281,12 @@ if ($db_conn){
 	if (array_key_exists('findmyinfo', $_POST)){
 	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) == 9){
 		$result = executePlainSQL("select name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
-		echo "<table>";
-		echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
-		while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-			echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
-		}
-		
+		//echo "<table>";
+		//echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
+		//while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+		//	echo "<tr><td>" . $row["NAME"] . "</td><td>" . $row["SIN"] . "</td><td>" . $row["AVAILABILITY"] . "</td><td>" . $row["SINCE"] . "</td><td>" . $row["POS"] . "</td><td>" . $row["SALARY"] . "</td></tr>"; 
+		//}
+		printSQL($result, 6);
 	echo "</table>";
 		OCICommit($db_conn);
 	}else {echo "Invalid Inputs. <br>";}
@@ -330,26 +329,37 @@ if ($db_conn){
 
 	if (array_key_exists('sub_fs_list', $_POST)){
 		// View staff list (sin, name, branch)
-		$result = executePlainSQL('select ssin, name, pc from staff s, worksat w where s.ssin=w.ssin and w.pc in (select pc from worksat where ssin=$login!) order by s.ssin');
-		printSQL($result, 3);
+		$result = executePlainSQL('select s.ssin, name, pc from staff s, worksat w where s.ssin=w.ssin order by s.ssin');
+		echo "<table>";
+	 	echo "<tr><th> SIN </th><th> Name </th><th> PC </th>";
+	 	printSQL($result, 3);
 	} else if (array_key_exists('sub_fs_SIN', $_POST)){
    		//Find staff by sin
    		$sin = $_POST['fs_SIN'];
    		if (is_numeric($sin) && strlen($sin)==9){
-			$result = executePlainSQL("select s.ssin, name, pc from Staff s, WorksAt w where s.ssin=$sin and s.ssin=w.ssin and w.pc in (select pc from WorksAt where ssin=$login) order by s.ssin");
+			$result = executePlainSQL("select s.ssin, name, pc from Staff s, WorksAt w where s.ssin=$sin and s.ssin=w.ssin ");
+   			echo "<table>";
+	 		echo "<tr><th> SIN </th><th> Name </th><th> PC </th>";
+	 		printSQL($result, 3);
    		} else echo "Invalid SIN. <br>";
 	} else if (array_key_exists('sub_fs_name', $_POST)) {
 		//Find staff by Name
 		$name = $_POST['fs_name'];
-		if(!is_numeric($name))
-			$result = executePlainSQL("select s.ssin, name, pc from staff s, worksat w where name='$name' and s.ssin=w.ssin and w.pc in (select pc from worksat where ssin=$login) order by s.ssin");
-		else echo "Invalid Name. <br>";
+		if(!is_numeric($name)) {
+			$result = executePlainSQL("select s.ssin, name, pc from staff s, worksat w where name='$name' and s.ssin=w.ssin order by s.ssin");
+			echo "<table>";
+	 		echo "<tr><th> SIN </th><th> Name </th><th> PC </th>";
+	 		printSQL($result, 3);
+		} else echo "Invalid Name. <br>";
 	} else if (array_key_exists('sub_fs_branch', $_POST)) {
 		//Find staff by branch
 	 	$pc = $_POST['fs_branch'];
-	 	if(strlen($pc)==7)
-	 		$result = executePlainSQL("select ssin, name, pc from Staff s, WorksAt w where s.ssin=w.ssin and w.pc='$pc' and w.pc in (select pc from WorksAt where ssin=$login) order by s.ssin");
-	 	else echo "Invalid postal code. <br>";
+	 	if(strlen($pc)==7) {
+	 		$result = executePlainSQL("select s.ssin, name, pc from Staff s, WorksAt w where s.ssin=w.ssin and w.pc='$pc' order by s.ssin");
+	 		echo "<table>";
+	 		echo "<tr><th> SIN </th><th> Name </th><th> PC </th>";
+	 		printSQL($result, 3);
+	 	} else echo "Invalid postal code. <br>";
 	} else if (array_key_exists('sub_as', $_POST)) {
 		// Add staff
 		$name = $_POST['as_name'];
@@ -368,11 +378,11 @@ if ($db_conn){
 			if (/*preg_match("(.*waiter.*)|(.*Waiter.*)",*/"Waiter" == $pos)
 				executePlainSQL("insert int Waiter values($sin, '$sch')");
 			else if (/*preg_match("(.*manager.*)|(.*Manager.*)",*/ "Manager" == $pos) {
-				executePlainSQL("insert into Manager values($sin);");
+				executePlainSQL("insert into Manager values($sin)");
 				executePlainSQL("update branch set ssin=$sin where pc='$pc'");
 			} else if (/*preg_match("(.*chef.*)|(.*Chef.*)"*/ "Chef" == $pos) 
 				executePlainSQL("insert into Chef values($sin, '$sch', null)");
-			$result = "Add successful!";
+			echo "Add successful!";
 			OCICommit($db_conn);
 		} else echo "Invalid Input. <br>";
 
@@ -391,7 +401,7 @@ if ($db_conn){
 			executePlainSQL("delete from WorksAt where ssin=$sin");
 	
 			// note: at least a branch is left without a manager 
-			$result = "Delete Successful! <br>";
+			echo "Delete Successful! <br>";
 			OCICommit($db_conn);
 		} else echo "Invalid Input. <br>";
 
@@ -417,7 +427,7 @@ if ($db_conn){
 						executePlainSQL("delete from Supervises where sr_sin = '$spvisor' and jr_sin=$sin");
 					else
 						echo "Please select add or remove. <br>";
-					$result = "Supervisor added! ";
+					echo "Supervisor added! ";
 				} else echo "Invalid supervisor SIN. <br>";
 			} 
 
@@ -429,7 +439,7 @@ if ($db_conn){
 						executePlainSQL("delete from Supervises where jr_sin = '$spvisee' and sr_sin=$sin");
 					else
 						echo "Please select add or remove. <br>";
-					$result .= "Supervisee added! ";
+					echo "Supervisee added! ";
 				} else echo "Invalid supervisee SIN. <br>";
 			} 
 
@@ -437,7 +447,7 @@ if ($db_conn){
 				if (strlen($pc)==7 && is_numeric($date) && strlen($date)==8){
 					$oldPos = executePlainSQL("select pos from WorksAt where ssin=$sin");
 					// save wa to hwa
-					executePlainSQL("insert into HasWorkedAt select $sin as ssin, pc, sfrom, $date as sto, pos, salary from WorksAt where ssin=$sin");
+					executePlainSQL("insert into HasWorkedAt select $sin as ssin, pc, since as sfrom, $date as sto, pos, salary from WorksAt where ssin=$sin");
 					
 					// if chef, man, or waiter add
 					if("Waiter" == $pos && "Chef" == $oldPos) {
@@ -480,56 +490,56 @@ if ($db_conn){
 						executePlainSQL("delete from Chef where staff_ssin=$sin");
 
 					} else if ("Manager"==$pos) {
-						executePlainSQL("insert into Manager values($sin)");
+						//executePlainSQL("insert into Manager values($sin)");
 						executePlainSQL("update Branch set ssin=$sin where pc='$pc'");
 
-					} else if ("Chef"==$pos) { 
+					} /*else if ("Chef"==$pos) { 
 						executePlainSQL("insert into Chef values($sin, null, null)");
 						//note: chef has no shifts or certificates
 					} else if ("Waiter"==$pos){
 						executePlainSQL("insert into Waiter values($sin, null)");
 						// note: waiter has no shfits
-					}
+					}*/
 					// update pos in wa
 					executePlainSQL("update WorksAt set pos='$pos' where ssin=$sin");
 					executePlainSQL("update WorksAt set salary=$sal where ssin=$sin");
 					executePlainSQL("update WorksAt set pc='$pc' where ssin=$sin");
 					executePlainSQL("update WorksAt set since=$date where ssin=$sin");
-					$result .= "New position added! ";
+					echo "New position added! ";
 				} else echo "Invalid Input. <br>";
 			}
 			if ($sch!=NULL) {// !!!!!!!!check this!!!!
 				executePlainSQL("update Waiter set shifts='$sch' where staff_ssin=$sin");
 				executePlainSQL("update Chef set schedule='$sch' where staff_ssin=$sin");
-				$result .= "Schedule updated! ";
+				echo "Schedule updated! ";
 			}
 
 			OCICommit($db_conn);
-		} echo "Invalid Staff SIN. <br>";
+		} else echo "Invalid Staff SIN. <br>";
 		
 	} else if (array_key_exists('sub_es_avsal', $_POST)) {
 		// set all to <= av salary 
 		$result = executePlainSQL("select count(*) from WorksAt where salary > (select AVG(salary) from Staff natural inner join WorksAt)");
  		executePlainSQL("update WorksAt set salary = (select AVG(salary) FROM Staff natural inner join WorksAt)
  						 where salary > (select AVG(salary) from Staff natural inner join WorksAt)");
-		$result = "Salary Updated. ";
+		echo "Salary Updated. ";
 		OCICommit($db_conn);
 	} /* else if (array_key_exists('sub_es_transfer', $_POST)) {
  		* transfer
  		* - args(branch)
  		* - 1 query
  		*		//!!!!!!
-	} */ else if (array_key_exists('sub_es_supall', $_POST)) {
+	}  else if (array_key_exists('sub_es_supall', $_POST)) {
 		// supervise all  !!!!
 		executePlainSQL("create VIEW WaitorWithMostPay(sin, since) AS SELECT w.staff_ssin, since FROM Waiter w, WorksAt wa1 WHERE w.staff_ssin = wa1.ssin AND NOT EXISTS 
 			(SELECT * FROM WorksAt wa2 WHERE wa1.salary < wa2.salary)");
 		executePlainSQL("create VIEW Candidate AS SELECT sin FROM WaitorWithMostPay w1 ORDER BY since");
 		executePlainSQL("insert INTO Supervises SELECT Candidate, sin FROM Waiter");
 		
-		$result = "Supervising all. ";
+		echo "Supervising all. ";
 		OCICommit($db_conn);
 
-	} else if (array_key_exists('sub_ub', $_POST)) {
+	} */else if (array_key_exists('sub_ub', $_POST)) {
 		// Update Branch	
 		$pc = $_POST["ub_branch"];
 		$budget = $_POST["ub_budget"];
@@ -537,7 +547,7 @@ if ($db_conn){
 		if(strlen($pc)==7 && is_numeric($budget) && is_numeric($performance)){
 			executePlainSQL("update branch set budget=$budget, performance=$performance");
 
-			$result = "Branch updated. ";
+			echo "Branch updated. ";
 			OCICommit($db_conn);
 		} else echo "Invalid Input. <br>";
 		
@@ -545,17 +555,25 @@ if ($db_conn){
 		// Find branches managed by a manager
 		$name = $_POST['o_man'];
 		$result = executePlainSQL("select pc from Branch b, Staff s where b.ssin=s.ssin and s.name='$name'");
+		echo "<table>";
+		echo "<tr><th> Branches: </th></tr>";
 		printSQL($result, 1);
 	} else if (array_key_exists('sub_o_compare', $_POST)) {
 		// Compare performances/		
 		$res = $_POST["o_compare"];
-		$result = executePlainSQL("select performance, pc from Branch where where name='$res' order by performance desc");
+		$result = executePlainSQL("select performance, pc, ssin from Branch where bname='$res' order by performance desc");
+		echo "<table>";
+		echo "<tr><th> Performance </th><th> PC </th><th> SIN </th></tr>";
+		printSQL($result, 3);
 	} else if (array_key_exists('sub_o_pop', $_POST)) {
 		// Find the most popular dishes
 
 		$res = $_POST["o_pop_res"];
 		$result = executePlainSQL("select dname from SellsDish sd1 where rname = '$res'
-						and not exists (select * from SellsDish sd2 where sd1.popularity < sd2.popularity)");
+						and not exists (select * from SellsDish sd2 where sd1.popularity < sd2.popularity and rname ='$res')");
+		echo "<table>";
+		echo "<tr><th> Dish Name: </th></tr>";
+		printSQL($result, 1);
 	} else if (array_key_exists('sub_o_cust', $_POST)) {
 		// Count #cust
 		$pc = $_POST["o_cust_br"];
@@ -563,10 +581,12 @@ if ($db_conn){
 		$to = $_POST["o_cust_to"];
 		if (strlen($pc)==7 && is_numeric($from) && strlen($from)==8 && is_numeric($to) && strlen($to)==8){
 			$result = executePlainSQL("select SUM(num) FROM Visits WHERE (v_date>=$from OR v_date<=$to) AND pc='$pc'");
+			echo "<table>";
+			echo "<tr><th> Totle Number of Customers: </th></tr>";
+			printSQL($result, 1);
 		} else echo "Invalid Input. <br>";
 	}
 	
-	printSQL($result);
 
 OCILogoff($db_conn);
 }
