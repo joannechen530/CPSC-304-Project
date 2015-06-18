@@ -27,7 +27,7 @@ $result = executePlainSQL("select pos, salary, pc, sfrom, sto from HasWorkedAt w
 while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 	echo "<font size='2'>Position: $row[0] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Salary: $row[1]</font><br>";
 	echo "<font size='2'>Branch: $row[2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; From: $row[3] 
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To: $row[4]</font><br><br><br>";
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To: $row[4]</font><br><br>";
 
 }
 ?>
