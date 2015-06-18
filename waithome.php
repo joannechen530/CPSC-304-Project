@@ -25,6 +25,14 @@ while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
 }
 ?>
 
+<p>Find my info: </p>
+<form method="POST" action="waithome.php">
+<!--refresh page when submit-->
+   <!--<p><input type="text" name="sininfo" size="6">-->
+<!--define variable to pass the value-->      
+<input type="submit" value="Search" name="findmyinfo"></p>
+</form>
+
 <p>Update Availability:</p>
 <p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
 <form method="POST" action="waithome.php">
@@ -133,8 +141,8 @@ if ($db_conn){
 
 	if (array_key_exists('findmyinfo', $_POST)){	
 		OCICommit($db_conn);
-	if(is_numeric($_POST['sininfo']) && strlen($_POST['sininfo']) == 9){
-	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = '".$_POST['sininfo']."'");
+	
+	$result = executePlainSQL("SELECT name, ssin, availability, since, pos, salary FROM Staff natural inner join WorksAt WHERE ssin = $login");
 	echo "<table>";
 	echo "<tr><th>Name</th><th>SIN</th><th>Availability</th><th>Worked Since</th><th>Position</th><th>Salary</th></tr>";
 	
@@ -143,7 +151,7 @@ if ($db_conn){
 	}
 	echo "</table>";
 
-	}else {echo "Invalid Inputs";}
+	
 
 	} else
 
