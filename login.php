@@ -5,13 +5,13 @@
 
 <form action="" method="post">
 SIN: <input type="text" name="user"><br>
-Password: <input type="text" name="pass"><br>
+Password: <input type="password" name="pass"><br>
 <input type="submit" name = 'slogin' value = "LOGIN">
 <br><br>
 Customer Login:<br>
 <form action="" method="post">
 UserName: <input type="text" name="cuser"><br>
-Password: <input type="text" name="cpass"><br>
+Password: <input type="password" name="cpass"><br>
 <input type="submit" name = 'clogin' value = "LOGIN">
 <br><br><br><br><br><br><br><br>
 
@@ -281,37 +281,38 @@ if(isset($_POST['slogin']))   // it checks whether the user clicked login button
 {
      $user = $_POST['user'];
      $pass = $_POST['pass'];
+     if (is_numeric($user) && strlen($user)=9){
+     	$result = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
+     	$row = OCI_Fetch_Array($result, OCI_BOTH);
 
+     	if ($row[0] != NULL){
+     		$chef = executePlainSQL("select staff_ssin from Chef where staff_ssin=$user");
+     		$waiter = executePlainSQL("select staff_ssin from Waiter where staff_ssin=$user");
+     		$manager = executePlainSQL("select staff_ssin from Manager where staff_ssin=$user");
+     		$crow = OCI_Fetch_Array($chef, OCI_BOTH);
+     		$wrow = OCI_Fetch_Array($waiter, OCI_BOTH);
+     		$mrow = OCI_Fetch_Array($manager, OCI_BOTH);
 
-     $result = executePlainSQL("select ssin from staff where ssin = $user AND pw = '$pass'");
-     $row = OCI_Fetch_Array($result, OCI_BOTH);
-
-     if ($row[0] != NULL){
-     	$chef = executePlainSQL("select staff_ssin from Chef where staff_ssin=$user");
-     	$waiter = executePlainSQL("select staff_ssin from Waiter where staff_ssin=$user");
-     	$manager = executePlainSQL("select staff_ssin from Manager where staff_ssin=$user");
-     	$crow = OCI_Fetch_Array($chef, OCI_BOTH);
-     	$wrow = OCI_Fetch_Array($waiter, OCI_BOTH);
-     	$mrow = OCI_Fetch_Array($manager, OCI_BOTH);
-
-     	if ($crow[0] != NULL) {
-     		setcookie("username", $user);
+     		if ($crow[0] != NULL) {
+     			setcookie("username", $user);
 			header("location:chefhome.php");
-     	}
-     	if ($wrow[0] != NULL){
-     		setcookie("username", $user);
+     		}
+     		if ($wrow[0] != NULL){
+     			setcookie("username", $user);
 			header("location:waithome.php");
-     	}
-     	if ($mrow[0] != NULL) {
-     		setcookie("username", $user);
+     		}
+     		if ($mrow[0] != NULL) {
+     			setcookie("username", $user);
 			header("location:manhome.php");
-     	} else {
-     		setcookie("username", $user);
+     		} else {
+     			setcookie("username", $user);
 			header("location:genstaffhome.php");
-     	}
+     		}
+     		
+	 } else echo "Invalid SIN or password. <br>";
+     } else echo "Invalid SIN. <br>";
 
      
-	} else echo "Invalid SIN or password. <br>";
 
      	
 }
@@ -320,7 +321,7 @@ if(isset($_POST['clogin']))   // it checks whether the user clicked login button
 {
      $user = $_POST['cuser'];
      $pass = $_POST['cpass'];
-
+     
      $result = executePlainSQL("SELECT username from customer where username = '$user' AND pw = '$pass'");
      $row = OCI_Fetch_Array($result, OCI_BOTH);
      echo "test".$row[0];
