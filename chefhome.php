@@ -3,14 +3,26 @@
 <body>
 <p>Cooks</p>
 
-<p>Find my info: </p>
-<p><font size="2"> SIN</font></p>
-<form method="POST" action="chefhome.php">
-<!--refresh page when submit-->
-   <p><input type="text" name="sininfo" size="6">
-<!--define variable to pass the value-->      
-<input type="submit" value="Search" name="findmyinfo"></p>
-</form>
+<?php 
+$db_conn = OCILogon("ora_l2r8", "a32433120", "ug");
+$login = 334455668;//$_COOKIE["username"];!!!
+echo "<p><font size='4'> My Info: </font></p>";
+$result = executePlainSQL("select name, s.ssin, pos, salary, pc, since from Staff s, WorksAt w where s.ssin=w.ssin and s.ssin=$login");
+$row = OCI_Fetch_Array($result, OCI_BOTH);
+echo "Current Position: <br><br>";
+echo "<font size='2'> Name: $row[0] </font><br>";
+echo "<font size='2'>SIN: $row[1] </font><br>";
+echo "<font size='2'>Position: $row[2] </font><br>";
+echo "<font size='2'>Salary: $row[3] </font><br>";
+echo "<font size='2'>Branch: $row[4] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Start Date: $row[5]</font><br><br><br>";
+echo "Past Positions: <br><br>";
+$result = executePlainSQL("select pos, salary, pc, sfrom, sto from HasWorkedAt where ssin=$login");
+while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
+	echo "<font size='2'>Position: $row[0] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Salary: $row[1]</font><br>";
+	echo "<font size='2'>Branch: $row[2] &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; From: $row[3] 
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To: $row[4]</font><br><br>";
+}
+?>
 
 <p>Update Availability:</p>
 <p><font size="2">SIN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;New Availability</font></p>
