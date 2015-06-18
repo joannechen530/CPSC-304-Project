@@ -1,0 +1,21 @@
+2015 Summer Term 1
+
+Project Part  3
+
+ 
+
+Group Name: NSLJ
+
+Group Members: Joanne Chen, Nichapat Bunmee, Stephnie Lam, Larissa Rode
+
+ 
+Name	        Student Number	Unix ID	Email Address
+Joanne Chen	 	41413139        r0a9    jouanchen@hotmail.com 	 
+Nichapat Bunmee	 33104126	 	y2q8     b.nichapat@gmail.com
+Stephanie Lam	 32433120      l2r8      stephanieashleylam@hotmail.com 
+Larissa Rode	35876135        r1b9     lara.rode@hotmail.com 	 	 
+ 
+
+By typing our names and student numbers in the above table, we certify that the work in the attached assignment was performed solely by those whose names and student IDs are included above.
+
+In addition, we indicate that we are fully aware of the rules and consequences of plagiarism, as set forth by the Department of Computer Science and the University of British Columbia.
