@@ -13,7 +13,20 @@ Customer Login:<br>
 UserName: <input type="text" name="cuser"><br>
 Password: <input type="password" name="cpass"><br>
 <input type="submit" name = 'clogin' value = "LOGIN">
-<br><br><br><br><br><br><br><br>
+<br><br><br>
+
+<p>Create user: </p>
+<p> Username&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Phone#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Password</p>
+<form method="POST" action="custhome.php">
+<!--refresh page when submit-->
+   <p><input type="text" name="newuser" size="6"><input type="text" name="newphone" size="6"><input type="text" name="newpw" size="6">
+<!--define variables to pass the value-->      
+<br><br><input type="submit" value="Create User" name="createuser"></p>
+</form>
+
+<br><br><br><br><br>
+
+
 
 
 <p>Find all branches</p>
@@ -148,6 +161,12 @@ function executeBoundSQL($cmdstr, $list) {
 	}
 }
 if ($db_conn){
+	if (array_key_exists('createuser', $_POST)){
+		if ( strlen($_POST['newuser']) < 20 && strlen($_POST['newphone']) <50 && strlen($_POST['newpw']) < 50){
+		executePlainSQL("INSERT into customer values ('".$_POST['newuser']."', '".$_POST['newphone']."', '".$_POST['newpw']."')");
+		echo "User created";
+		}else{echo "Invalid Inputs";}
+	}else 
 	if (array_key_exists('searchforbranchesincity', $_POST)){
 		if (trim($_POST['citybranches']) == "" && trim($_POST['provincebranches']) == ""){
 			$statement = "SELECT * FROM BRANCH where NAME ='".$_POST['rnamebranches']."'";
