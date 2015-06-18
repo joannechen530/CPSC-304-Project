@@ -152,7 +152,7 @@ if ($db_conn){
 	echo "<tr><th>Name</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["name"] . "</td></tr>"; 
+		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
 	}
 	echo "</table>";
 		OCICommit($db_conn);
@@ -162,12 +162,12 @@ if ($db_conn){
 
 	if (array_key_exists('supervisoremployees', $_POST)){
 	if(is_numeric($_POST['sinsuperem']) && strlen($_POST['sinsuperem']) == 9){
-	$result = executePlainSQL("select name from staff where ssin = (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
+	$result = executePlainSQL("select ssin, name from staff where ssin IN (select jr_sin from supervises where sr_sin = '".$_POST['sinsuperem']."')");	
 	echo "<table>";
-	echo "<tr><th>Name</th></tr>";
+	echo "<tr><th>Sin</th><th>Name</th></tr>";
 
 	while ($row = OCI_Fetch_Array($result, OCI_BOTH)) {
-		echo "<tr><td>" . $row["NAME"] . "</td></tr>"; 
+		echo "<tr><td>" . $row["SSIN"] . "</td><td>" . $row["NAME"] . "</td></tr>"; 
 	}
 	echo "</table>";
 	OCICommit($db_conn);
